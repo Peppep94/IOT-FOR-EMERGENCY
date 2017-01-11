@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Calendar;
+import java.util.Date;
 
 import android.util.Log;
 
@@ -35,12 +36,16 @@ public class RegisterActivity extends AppCompatActivity {
                     mDay = dayOfMonth;
                     updateDisplay();
                 }
+
             };
 
+
+
     protected Dialog onCreateDialog(int id) {
-        return new DatePickerDialog(this,
-                mDateSetListener,
-                mYear, mMonth, mDay);
+        DatePickerDialog dialog = new DatePickerDialog(this, mDateSetListener, mYear, mMonth, mDay);
+        dialog.getDatePicker().setMaxDate(new Date().getTime());
+        return dialog;
+
     }
 
     @Override
@@ -102,7 +107,6 @@ public class RegisterActivity extends AppCompatActivity {
         mYear = c.get(Calendar.YEAR);
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
-
         updateDisplay();
 
 
