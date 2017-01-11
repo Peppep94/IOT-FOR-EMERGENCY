@@ -90,22 +90,12 @@
             android:layout_centerHorizontal="true" />
 
         <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonData"
-            android:background="@drawable/calendario"
-            android:layout_gravity="center_vertical"
-            android:layout_below="@+id/Data"
-            android:layout_centerHorizontal="true" />
-
-        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Registrati"
             android:id="@+id/buttonRegistra"
             android:layout_gravity="bottom"
-            android:layout_below="@+id/listview"
+            android:layout_below="@+id/buttonData"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="23dp" />
 
@@ -125,10 +115,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/listview"
-            android:layout_below="@+id/buttonData"
             android:layout_marginTop="36dp"
             android:layout_alignRight="@+id/ConfermaPassword"
-            android:layout_alignEnd="@+id/ConfermaPassword" />
+            android:layout_alignEnd="@+id/ConfermaPassword"
+            android:layout_below="@+id/buttonData" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonData"
+            android:layout_below="@+id/Data"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="17dp"
+            android:src="@drawable/calendario"
+            android:background="@null" />
 
     </RelativeLayout>
 </ScrollView>

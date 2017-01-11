@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Calendar;
@@ -20,7 +21,7 @@ public class RegisterActivity extends AppCompatActivity {
     public static final String TAG =RegisterActivity.class.getSimpleName();
     private DbHelper db;
     protected TextView mDateDisplay;
-    protected Button mPickDate;
+    protected ImageButton mPickDate;
     protected int mYear;
     protected int mMonth;
     protected int mDay;
@@ -89,7 +90,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
         mDateDisplay = (TextView) findViewById(R.id.Data);
-        mPickDate = (Button) findViewById(R.id.buttonData);
+        mPickDate = (ImageButton) findViewById(R.id.buttonData);
 
         mPickDate.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
