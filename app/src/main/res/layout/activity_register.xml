@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="univpm.iot_for_emergency.RegisterActivity"
+    >
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="univpm.provelogin.RegisterActivity"
+        >
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/Name"
+            android:layout_marginTop="47dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:hint="Nome" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/User"
+            android:hint="Username (email)*"
+            android:layout_below="@+id/Cognome"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="false"
+            android:layout_marginTop="23dp"
+            android:layout_alignRight="@+id/Password"
+            android:layout_alignEnd="@+id/Password" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/Password"
+            android:layout_below="@+id/User"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:hint="Password*" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:id="@+id/ConfermaPassword"
+            android:hint="Conferma Password*"
+            android:layout_below="@+id/Password"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="23dp"
+            android:layout_alignRight="@+id/Password"
+            android:layout_alignEnd="@+id/Password" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Registrazione utente"
+            android:id="@+id/textView3"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="GG/MM/YYYY"
+            android:id="@+id/Data"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="21dp"
+            android:layout_below="@+id/ConfermaPassword"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonData"
+            android:background="@drawable/calendario"
+            android:layout_gravity="center_vertical"
+            android:layout_below="@+id/Data"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registrati"
+            android:id="@+id/buttonRegistra"
+            android:layout_gravity="bottom"
+            android:layout_below="@+id/listview"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="23dp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/Cognome"
+            android:layout_below="@+id/Name"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="27dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:hint="Cognome" />
+
+        <ExpandableListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/listview"
+            android:layout_below="@+id/buttonData"
+            android:layout_marginTop="36dp"
+            android:layout_alignRight="@+id/ConfermaPassword"
+            android:layout_alignEnd="@+id/ConfermaPassword" />
+
+    </RelativeLayout>
+</ScrollView>
