@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="univpm.iot_for_emergency.LoginActivity">
+    tools:context=".UI.Login">
 
     <EditText
         android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:text="Registrati"
         android:id="@+id/RegisterHere"
-        android:layout_below="@+id/button2"
+        android:layout_below="@+id/bLoginGuest"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp" />
 
@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Accedi come utente ospite"
-        android:id="@+id/button2"
+        android:id="@+id/bLoginGuest"
         android:layout_below="@+id/button"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp" />
