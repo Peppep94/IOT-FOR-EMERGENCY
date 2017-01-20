@@ -60,16 +60,19 @@ public class Registrazione extends AppCompatActivity {
         return dialog;
 
     }
+
+
     //operazioni effettuate automaticamente all'avvio dell'attività
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
         db= new Db(this);
-        //List<String> listaproblemi =new ArrayList<String>(Arrays.asList(problemi));
-        //final ArrayAdapter<String> adapterlista=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,listaproblemi);
-        //lista.setAdapter(adapterlista);
         final Button bRegister=(Button) findViewById(R.id.buttonRegistra);
+
+
+        datepicker();
         bRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,6 +80,14 @@ public class Registrazione extends AppCompatActivity {
             }
         });
 
+
+
+
+
+
+    }
+
+    public void datepicker(){
 
 
 
@@ -94,10 +105,6 @@ public class Registrazione extends AppCompatActivity {
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
         updateDisplay();
-
-
-
-
     }
     // richiama l'oggetto db e gli fa inserire un nuovo utente
     private void Registra(){
@@ -119,12 +126,11 @@ public class Registrazione extends AppCompatActivity {
         String Confpass = confPassword.getText().toString();
 
         DataN =  String.valueOf(new StringBuilder()
-                .append(mYear).append("-")
-                .append(mMonth+1).append("-")
-                .append(mDay).append(" "));
+                .append(mDay).append("/")
+                .append(mMonth+1).append("/")
+                .append(mYear).append(" "));
 
         String[] controllo=db.getUtente(User);
-
         if(User.isEmpty() || Pass.isEmpty()){
             displayToast("I campi contrassegnati con * non posso essere vuoti");
         }else if (!Pass.equals(Confpass)){
@@ -141,12 +147,12 @@ public class Registrazione extends AppCompatActivity {
     protected void updateDisplay() {
         mDateDisplay.setText(
                 new StringBuilder()
-                        .append(mMonth + 1).append("/")
                         .append(mDay).append("/")
+                        .append(mMonth+1).append("/")
                         .append(mYear).append(" "));
     }
     //mostra a video dei messaggi
-    private void displayToast(String message){
+    public void displayToast(String message){
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 

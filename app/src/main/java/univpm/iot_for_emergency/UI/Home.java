@@ -33,20 +33,27 @@ public class Home extends AppCompatActivity {
             }
         });
         Intent intent =getIntent();
-        String user=intent.getStringExtra("user");
+        String user;
         user=sessione.user();
-        String [] utente=db.getUtente(user);
+
         final TextView benvenuto=(TextView) findViewById(R.id.textView);
-        final TextView nome=(TextView) findViewById(R.id.HomeNome);
-        final TextView cognome=(TextView) findViewById(R.id.HomeCognome);
-        final TextView password=(TextView) findViewById(R.id.HomePassword);
-        final TextView username=(TextView) findViewById(R.id.HomeUser);
+        final Button modifica=(Button) findViewById(R.id.buttonmodifica);
+
+        if(user.contains("Guest"))
+        {
+            modifica.setVisibility(View.INVISIBLE);
+        }
 
         benvenuto.setText(new StringBuilder().append("Benvenuto ").append(user));
-        nome.setText(utente[2]);
-        cognome.setText(utente[3]);
-        password.setText(utente[4]);
-        username.setText(user);
+
+
+        modifica.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Home.this, Modifica_dati.class); //reinderizzo a Modificadati
+                Home.this.startActivity(intent);
+            }
+        });
     }
 
     private void loguot(){

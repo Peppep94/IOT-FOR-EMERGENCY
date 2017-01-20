@@ -16,7 +16,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".UI.Home" />
-        <activity android:name=".UI.Registrazione"></activity>
+        <activity android:name=".UI.Registrazione" />
+        <activity android:name=".UI.Modifica_dati"></activity>
     </application>
 
 </manifest>

@@ -93,6 +93,7 @@ public class Db extends SQLiteOpenHelper {
                 USER + " = " + "'"+user+"'", null);
         if(c.moveToFirst()){
 
+            utente[0]=c.getString(0);
             utente[1]= c.getString(1);
             utente[2]= c.getString(2);
             utente[3]= c.getString(3);
@@ -127,5 +128,21 @@ public class Db extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return id;
+    }
+
+    public void modificaUtente(String username, String name,String cognome, String password, String data, String problemi,String sesso,int identificativo){
+
+        SQLiteDatabase db =this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(USER,username);
+        values.put(NOME,name);
+        values.put(COGNOME,cognome);
+        values.put(PASSWORD,password);
+        values.put(PROBLEMI,problemi);
+        values.put(DATAN,data);
+        values.put(SESSO,sesso);
+        long id=db.update(TABELLA_UTENTE,values,"_id= ?",new String[] {String.valueOf(identificativo)});
+        db.close();
     }
 }

@@ -25,60 +25,18 @@
         android:text="Logout"
         android:id="@+id/buttonLogout"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="82dp" />
+        android:layout_centerHorizontal="true" />
 
-    <TextView
+
+
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/HomeNome"
-        android:layout_below="@+id/textView"
-        android:layout_marginTop="34dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:text="Modifica dati "
+        android:id="@+id/buttonmodifica"
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/HomeCognome"
-        android:layout_below="@+id/HomeNome"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="27dp"
-        android:layout_alignRight="@+id/HomeNome"
-        android:layout_alignEnd="@+id/HomeNome" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/HomePassword"
-        android:layout_below="@+id/HomeCognome"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="29dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/HomeUser"
         android:layout_above="@+id/buttonLogout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/HomePassword"
-        android:layout_alignEnd="@+id/HomePassword" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/HomeData"
-        android:layout_above="@+id/HomeUser"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="88dp"
-        android:layout_alignRight="@+id/HomeUser"
-        android:layout_alignEnd="@+id/HomeUser" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="72dp" />
 </RelativeLayout>
