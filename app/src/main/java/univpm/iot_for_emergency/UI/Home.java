@@ -50,7 +50,7 @@ public class Home extends AppCompatActivity {
         modifica.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Home.this, Modifica_dati.class); //reinderizzo a Modificadati
+                Intent intent = new Intent(Home.this, RicercaBLE.class); //reinderizzo a Modificadati
                 Home.this.startActivity(intent);
             }
         });
