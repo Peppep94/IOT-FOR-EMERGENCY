@@ -124,7 +124,7 @@ public class Modifica_dati extends AppCompatActivity {
                     displayToast("Username non disponibile");
                 }else{
 
-                    db.modificaUtente(String.valueOf(username.getText()),String.valueOf(name.getText()),String.valueOf(cognome.getText()),String.valueOf(password.getText()),data,String.valueOf(problemi.getText()),String.valueOf(sesso.getText()),id);
+                    db.modificaUtente(username.toString(),name.toString(),cognome.toString(),password.toString(),data,problemi.toString(),sesso.toString(),id);
                     sessione.UtenteLoggato(true,String.valueOf(username.getText()));
                     displayToast("Modifica avvenuta con successo ");
                     Intent intent = new Intent(Modifica_dati.this, Home.class); //reinderizzo a Home passando il parametro "username"
