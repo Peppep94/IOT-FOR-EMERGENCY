@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +42,8 @@ public class Modifica_dati extends AppCompatActivity {
     protected int mYear;
     protected int mMonth;
     protected int mDay;
-
+    protected String sesso;
+    protected String problemi;
 
     protected DatePickerDialog.OnDateSetListener mDateSetListener =
             new DatePickerDialog.OnDateSetListener() {
@@ -78,8 +82,6 @@ public class Modifica_dati extends AppCompatActivity {
         final EditText username=(EditText) findViewById(R.id.UUser);
         final EditText password=(EditText) findViewById(R.id.UPassword);
         final EditText confPassword=(EditText) findViewById(R.id.ConfermaUPassword);
-        final EditText problemi=(EditText) findViewById(R.id.UProblemi);
-        final EditText sesso=(EditText) findViewById(R.id.USesso);
         final Button bconfmodifica=(Button) findViewById(R.id.buttonConfModifica);
 
         final int id= Integer.parseInt(datiutent[0]);
@@ -89,8 +91,9 @@ public class Modifica_dati extends AppCompatActivity {
         cognome.setText(datiutent[3]);
         password.setText(datiutent[4]);
         confPassword.setText(datiutent[4]);
-        problemi.setText(datiutent[5]);
-        sesso.setText(datiutent[7]);
+
+         problemi=(datiutent[5]);
+         sesso=(datiutent[7]);
 
         String[] datasezionata=datiutent[6].split("/");
 
@@ -98,7 +101,7 @@ public class Modifica_dati extends AppCompatActivity {
         mMonth= Integer.parseInt(datasezionata[1])-1;
         mYear= Integer.parseInt(datasezionata[2].trim());
         datepicker();
-
+        spinner();
 
 
         bconfmodifica.setOnClickListener(new View.OnClickListener() {
@@ -141,7 +144,56 @@ public class Modifica_dati extends AppCompatActivity {
     }
 
 
+    public void spinner(){
+        String compareValuesesso=sesso;
+        Spinner spinnersesso = (Spinner)findViewById(R.id.USesso);
+        final ArrayAdapter<String> adaptersesso = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new String[]{"Maschio","Femmina"}
+        );
+        spinnersesso.setAdapter(adaptersesso);
+        if (!compareValuesesso.equals(null)) {
+            int spinnerPosition = adaptersesso.getPosition(compareValuesesso);
+            spinnersesso.setSelection(spinnerPosition);
+        }
+        spinnersesso.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adaptersesso, View view,int pos, long id) {
 
+                    Sesso = (String)adaptersesso.getItemAtPosition(pos);
+
+
+
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
+
+        String compareValueprob=problemi;
+        Spinner spinnerproblemi = (Spinner)findViewById(R.id.UProblemi);
+        final ArrayAdapter<String> adapterproblemi = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new String[]{"Nessuno","Sedia a rotelle","Stampelle"}
+        );
+        spinnerproblemi.setAdapter(adapterproblemi);
+        if (!compareValueprob.equals(null)) {
+            int spinnerPosition = adapterproblemi.getPosition(compareValueprob);
+            spinnerproblemi.setSelection(spinnerPosition);
+        }
+        spinnerproblemi.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterproblemi, View view,int pos, long id) {
+
+                    Problemi = (String) adapterproblemi.getItemAtPosition(pos);
+
+
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
+    }
     public void datepicker(){
 
 

@@ -5,12 +5,14 @@ import android.app.Dialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -71,7 +73,7 @@ public class Registrazione extends AppCompatActivity {
         db= new Db(this);
         final Button bRegister=(Button) findViewById(R.id.buttonRegistra);
 
-
+        spinner();
         datepicker();
         bRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,8 +85,46 @@ public class Registrazione extends AppCompatActivity {
 
 
 
+    }
+
+    public void spinner(){
+
+        Spinner spinnersesso = (Spinner)findViewById(R.id.Sesso);
+        final ArrayAdapter<String> adaptersesso = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new String[]{"Maschio","Femmina"}
+        );
+        spinnersesso.setAdapter(adaptersesso);
+        spinnersesso.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adaptersesso, View view,int pos, long id) {
+                    Sesso = (String)adaptersesso.getItemAtPosition(pos);
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
 
 
+        Spinner spinnerproblemi = (Spinner)findViewById(R.id.Problemi);
+        final ArrayAdapter<String> adapterproblemi = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new String[]{"Nessuno","Sedia a rotelle","Stampelle"}
+        );
+        spinnerproblemi.setAdapter(adapterproblemi);
+
+        spinnerproblemi.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterproblemi, View view,int pos, long id) {
+
+                    Problemi = (String) adapterproblemi.getItemAtPosition(pos);
+
+
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
     }
 
     public void datepicker(){
@@ -114,15 +154,12 @@ public class Registrazione extends AppCompatActivity {
         final EditText username=(EditText) findViewById(R.id.User);
         final EditText password=(EditText) findViewById(R.id.Password);
         final EditText confPassword=(EditText) findViewById(R.id.ConfermaPassword);
-        final EditText problemi=(EditText) findViewById(R.id.Problemi);
-        final EditText sesso=(EditText) findViewById(R.id.Sesso);
+
 
         Nome = name.getText().toString();
         Cognome = cognome.getText().toString();
         User = username.getText().toString();
         Pass = password.getText().toString();
-        Sesso=sesso.getText().toString();
-        Problemi=problemi.getText().toString();
         String Confpass = confPassword.getText().toString();
 
         DataN =  String.valueOf(new StringBuilder()

@@ -110,29 +110,23 @@
             android:layout_alignParentEnd="true"
             android:hint="Cognome" />
 
-        <EditText
+        <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/Sesso"
-            android:layout_below="@+id/Cognome"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:layout_marginTop="27dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:hint="Sesso" />
+            android:layout_below="@+id/textView4"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
-        <EditText
+        <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/Problemi"
+            android:layout_marginTop="64dp"
             android:layout_below="@+id/Sesso"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="27dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:hint="Problemi" />
+            android:layout_alignParentStart="true" />
 
 
 
@@ -145,6 +139,30 @@
             android:layout_marginTop="17dp"
             android:src="@drawable/calendario"
             android:background="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_marginLeft="3dp"
+            android:text="Sesso"
+            android:id="@+id/textView4"
+            android:layout_below="@+id/Cognome"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="25dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Problema"
+            android:id="@+id/textView5"
+            android:layout_below="@+id/Sesso"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="19dp" />
 
     </RelativeLayout>
 </ScrollView>
