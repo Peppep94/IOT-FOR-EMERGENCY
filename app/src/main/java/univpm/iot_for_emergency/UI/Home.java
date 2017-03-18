@@ -1,59 +1,101 @@
 package univpm.iot_for_emergency.UI;
 
+import android.content.ClipData;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import univpm.iot_for_emergency.DbAdapter.Db;
-import univpm.iot_for_emergency.R;
+
 import univpm.iot_for_emergency.Funzionali.Sessione;
+import univpm.iot_for_emergency.R;
 
-public class Home extends AppCompatActivity {
-    public static final String TAG =Home.class.getSimpleName();
+public class Home extends AppCompatActivity
+
+        implements NavigationView.OnNavigationItemSelectedListener {
+
     private Sessione sessione;
-    Db db = new Db(this);
+    private String user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         sessione = new Sessione(this);
         if (!sessione.loggedin()) {
             loguot();
         }
 
-        final Button blogout = (Button) findViewById(R.id.buttonLogout);
-        blogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loguot();
-            }
-        });
-        Intent intent =getIntent();
-        String user;
+
         user=sessione.user();
 
         final TextView benvenuto=(TextView) findViewById(R.id.textView);
-        final Button modifica=(Button) findViewById(R.id.buttonmodifica);
 
-        if(user.contains("Guest"))
-        {
-            modifica.setVisibility(View.INVISIBLE);
-        }
+
 
         benvenuto.setText(new StringBuilder().append("Benvenuto ").append(user));
 
 
-        modifica.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Home.this, RicercaBLE.class); //reinderizzo a Modificadati
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+
+
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.modificadati) {
+            if(user.contains("Guest"))
+            {
+                Toast.makeText(getApplicationContext(),"Non sei abilitato alla modifica",Toast.LENGTH_SHORT).show(); //in caso di utente guest non permetto la modifica
+            }
+            else {
+                Intent intent = new Intent(Home.this, Modifica_dati.class); //reinderizzo a Modificadati
                 Home.this.startActivity(intent);
             }
-        });
+        } else if (id == R.id.logout) {
+          loguot();
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     private void loguot(){

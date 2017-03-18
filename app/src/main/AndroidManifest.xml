@@ -18,14 +18,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".UI.Home" />
         <activity android:name=".UI.Registrazione" />
         <activity android:name=".UI.Modifica_dati" />
 
         <uses-permission android:name="android.permission.BLUETOOTH" />
         <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
-        <activity android:name=".UI.RicercaBLE"></activity>
+        <activity android:name=".UI.RicercaBLE" />
+        <activity
+            android:name=".UI.Home"
+            android:label="@string/title_activity_home2"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
