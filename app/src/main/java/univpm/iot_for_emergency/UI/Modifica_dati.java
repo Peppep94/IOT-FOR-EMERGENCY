@@ -138,6 +138,7 @@ public class Modifica_dati extends AppCompatActivity {
 
     }
 
+
     //mostra a video dei messaggi
     private void displayToast(String message){
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();

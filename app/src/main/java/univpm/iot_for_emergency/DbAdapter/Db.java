@@ -23,6 +23,8 @@ public class Db extends SQLiteOpenHelper {
     public static final String PROBLEMI ="problemi";
     public static final String SESSO ="sesso";
 
+
+
     public static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABELLA_UTENTE + "( "+
             ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"+
             USER + " TEXT,"+

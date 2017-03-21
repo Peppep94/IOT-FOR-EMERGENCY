@@ -1,4 +1,4 @@
-package univpm.iot_for_emergency.UI;
+package univpm.iot_for_emergency.Funzionali;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 import univpm.iot_for_emergency.R;
 
-public class RicercaBLE extends AppCompatActivity {
+public class BleAdapter extends AppCompatActivity {
 
     private BluetoothAdapter btAdapter;
     private Set<BluetoothDevice> dispositivi;

@@ -24,7 +24,7 @@
         <uses-permission android:name="android.permission.BLUETOOTH" />
         <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
-        <activity android:name=".UI.RicercaBLE" />
+        <activity android:name=".Funzionali.BleAdapter" />
         <activity
             android:name=".UI.Home"
             android:label="@string/title_activity_home2"
