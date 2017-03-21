@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import univpm.iot_for_emergency.Funzionali.BleAdapter;
 import univpm.iot_for_emergency.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
 
@@ -83,6 +84,10 @@ public class Home extends AppCompatActivity
             }
         } else if (id == R.id.logout) {
           loguot();
+        } else if( id==R.id.ricerca)
+        {
+            Intent intent = new Intent(Home.this, BleAdapter.class); //reinderizzo a Modificadati
+            Home.this.startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

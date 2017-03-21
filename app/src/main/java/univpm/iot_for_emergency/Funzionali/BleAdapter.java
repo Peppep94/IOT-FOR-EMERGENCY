@@ -28,7 +28,7 @@ public class BleAdapter extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ricerca_ble);
         btAdapter = BluetoothAdapter.getDefaultAdapter();
-        lv = (ListView)findViewById(R.id.listview);
+        lv = (ListView)findViewById(R.id.listviewble);
         adapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
         lv.setAdapter(adapter);
     }
