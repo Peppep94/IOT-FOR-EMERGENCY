@@ -3,7 +3,9 @@
     package="univpm.iot_for_emergency">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -21,8 +23,6 @@
         <activity android:name=".UI.Registrazione" />
         <activity android:name=".UI.Modifica_dati" />
 
-        <uses-permission android:name="android.permission.BLUETOOTH" />
-        <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
         <activity android:name=".Funzionali.BleAdapter" />
         <activity
@@ -30,5 +30,6 @@
             android:label="@string/title_activity_home2"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
+    <service android:name=".BluetoothLeService" android:enabled="true"/>
 
 </manifest>
