@@ -2,8 +2,9 @@ package univpm.iot_for_emergency.Funzionali;
 
 
 import univpm.iot_for_emergency.R;
-
-
+import univpm.iot_for_emergency.UI.Home;
+import univpm.iot_for_emergency.UI.Login;
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -20,7 +21,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,12 +40,15 @@ import java.util.List;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class BleAdapter extends AppCompatActivity {
 
+    private static final int MY_PERMISSIONS_REQUEST =1 ;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
 
     private boolean mScanning;
 
     private static final int RQS_ENABLE_BLUETOOTH = 1;
+
+    private View mLayout;
 
     Button btnScan;
     ListView listViewLE;
@@ -55,6 +63,12 @@ public class BleAdapter extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ricerca_ble);
+
+        requestPositionPermission();
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
 
         // Controllo se il BLE è supportato
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -150,6 +164,7 @@ public class BleAdapter extends AppCompatActivity {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, RQS_ENABLE_BLUETOOTH);
+                scanLeDevice(true);
             }
         }
     }
@@ -179,7 +194,7 @@ public class BleAdapter extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void getBluetoothAdapterAndLeScanner(){
-        // Get BluetoothAdapter and BluetoothLeScanner.
+        // BluetoothAdapter e BluetoothLeScanner.
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -189,16 +204,16 @@ public class BleAdapter extends AppCompatActivity {
     }
 
     /*
-    to call startScan (ScanCallback callback),
-    Requires BLUETOOTH_ADMIN permission.
-    Must hold ACCESS_COARSE_LOCATION or ACCESS_FINE_LOCATION permission to get results.
+    per richiamare (ScanCallback callback),
+    è necessario avere i permessi BLUETOOTH_ADMIN .
+    Bisogna assere abilitati i permessi per ACCESS_COARSE_LOCATION o ACCESS_FINE_LOCATION pper ottenere il risultato.
      */
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             listBluetoothDevice.clear();
             listViewLE.invalidateViews();
 
-            // Stops scanning after a pre-defined scan period.
+            // Lo scan si ferma dopo un tempo predefinito.
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -255,4 +270,31 @@ public class BleAdapter extends AppCompatActivity {
             }
         }
     };
+
+    private void requestPositionPermission() {
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
+
+            Snackbar.make(mLayout, "I permessi per la posizione servonpo per effettuare lo scan",
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction("ok", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(BleAdapter.this,
+                                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    MY_PERMISSIONS_REQUEST);
+                        }
+                    })
+                    .show();
+        } else {
+
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    MY_PERMISSIONS_REQUEST);
+        }
+
+    }
+
+
 }
