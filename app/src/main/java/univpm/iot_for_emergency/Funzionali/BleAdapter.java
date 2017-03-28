@@ -2,8 +2,6 @@ package univpm.iot_for_emergency.Funzionali;
 
 
 import univpm.iot_for_emergency.R;
-import univpm.iot_for_emergency.UI.Home;
-import univpm.iot_for_emergency.UI.Login;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,14 +41,12 @@ public class BleAdapter extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST =1 ;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
-
+    private BluetoothLeService mBluetoothLeService;
     private boolean mScanning;
 
     private static final int RQS_ENABLE_BLUETOOTH = 1;
 
     private View mLayout;
-
-    Button btnScan;
     ListView listViewLE;
 
     List<BluetoothDevice> listBluetoothDevice;
@@ -58,11 +54,13 @@ public class BleAdapter extends AppCompatActivity {
 
     private Handler mHandler;
     private static final long SCAN_PERIOD = 10000;
+    private final static String TAG = BleAdapter.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ricerca_ble);
+        mBluetoothLeService=new BluetoothLeService();
 
         requestPositionPermission();
 
@@ -89,13 +87,7 @@ public class BleAdapter extends AppCompatActivity {
             return;
         }
 
-        btnScan = (Button)findViewById(R.id.scan);
-        btnScan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scanLeDevice(true);
-            }
-        });
+
         listViewLE = (ListView)findViewById(R.id.lelist);
 
         listBluetoothDevice = new ArrayList<>();
@@ -105,6 +97,7 @@ public class BleAdapter extends AppCompatActivity {
         listViewLE.setOnItemClickListener(scanResultOnItemClickListener);
 
         mHandler = new Handler();
+        scanLeDevice(true);
 
     }
 
@@ -114,7 +107,6 @@ public class BleAdapter extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     final BluetoothDevice device = (BluetoothDevice) parent.getItemAtPosition(position);
-
                     String msg = device.getAddress() + "\n"
                             + device.getBluetoothClass().toString() + "\n"
                             + getBTDevieType(device);
@@ -125,7 +117,6 @@ public class BleAdapter extends AppCompatActivity {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-
                                 }
                             })
                             .show();
@@ -199,7 +190,6 @@ public class BleAdapter extends AppCompatActivity {
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
         mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
-
         mScanning = false;
     }
 
@@ -225,17 +215,15 @@ public class BleAdapter extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
 
                     mScanning = false;
-                    btnScan.setEnabled(true);
                 }
             }, SCAN_PERIOD);
 
             mBluetoothLeScanner.startScan(scanCallback);
             mScanning = true;
-            btnScan.setEnabled(false);
         } else {
             mBluetoothLeScanner.stopScan(scanCallback);
             mScanning = false;
-            btnScan.setEnabled(true);
+
         }
     }
 
@@ -243,8 +231,9 @@ public class BleAdapter extends AppCompatActivity {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-
             addBluetoothDevice(result.getDevice());
+            mBluetoothLeService.connect(result.getDevice().getAddress(),mBluetoothAdapter);
+            scanLeDevice(false);
         }
 
         @Override
@@ -284,12 +273,11 @@ public class BleAdapter extends AppCompatActivity {
                             ActivityCompat.requestPermissions(BleAdapter.this,
                                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                                     MY_PERMISSIONS_REQUEST);
+
                         }
                     })
                     .show();
         } else {
-
-
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     MY_PERMISSIONS_REQUEST);
         }
