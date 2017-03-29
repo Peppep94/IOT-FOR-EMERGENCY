@@ -30,11 +30,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class BleAdapter extends AppCompatActivity {
 
@@ -65,7 +65,6 @@ public class BleAdapter extends AppCompatActivity {
         requestPositionPermission();
 
         int permissionCheck = ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION);
-
 
 
         // Controllo se il BLE è supportato
@@ -117,6 +116,7 @@ public class BleAdapter extends AppCompatActivity {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    mBluetoothLeService.disconnect();
                                 }
                             })
                             .show();
@@ -232,8 +232,10 @@ public class BleAdapter extends AppCompatActivity {
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             addBluetoothDevice(result.getDevice());
-            mBluetoothLeService.connect(result.getDevice().getAddress(),mBluetoothAdapter);
-            scanLeDevice(false);
+            if(result.getDevice().getName().contains("SensorTag")) {
+                mBluetoothLeService.connect(result.getDevice().getAddress(), mBluetoothAdapter);
+                scanLeDevice(false);
+            }
         }
 
         @Override
