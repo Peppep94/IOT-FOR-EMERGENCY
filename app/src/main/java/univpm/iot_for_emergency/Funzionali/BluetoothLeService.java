@@ -33,19 +33,12 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.TextView;
 
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import univpm.iot_for_emergency.R;
 
 import static android.R.attr.action;
-import static univpm.iot_for_emergency.R.id.temperatura;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
@@ -60,16 +53,13 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
+
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
 
     private static final byte[] ENABLE_SENSOR = {0x01};
     private static final UUID UUID_CCC = UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb");
-
-    private static final Queue<Object> sWriteQueue = new ConcurrentLinkedQueue<Object>();
-    private static boolean sIsWriting = false;
-    private BluetoothGatt mGatt = null;
 
 
     // Implements callback methods for GATT events that the app cares about.  For example,
@@ -93,44 +83,23 @@ public class BluetoothLeService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
 
+
             BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
             BluetoothGattCharacteristic humidityCharacteristic = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_DATA);
-            BluetoothGattCharacteristic enableHum = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_CONF);
             gatt.setCharacteristicNotification(humidityCharacteristic,true);
 
-            enableHum.setValue(ENABLE_SENSOR);
-           gatt.writeCharacteristic(enableHum);
+            BluetoothGattDescriptor descriptor = humidityCharacteristic.getDescriptor(UUID.fromString("f000aa22-0451-4000-b000-000000000000"));
+            Log.i(TAG, "Descriptor"+descriptor);
+            descriptor.setValue(ENABLE_SENSOR);
+            gatt.writeDescriptor(descriptor);
             gatt.readCharacteristic(humidityCharacteristic);
 
         }
-      @Override
-      public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status){
-          Log.i(TAG, "Ho scritto la caratteristica "+characteristic.getPermissions());
-          BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
-          BluetoothGattCharacteristic humidityCharacteristic = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_DATA);
-          gatt.readCharacteristic(humidityCharacteristic);
 
-      }
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            Log.i(TAG, "Ho letto la caratteristica");
-            byte []value=characteristic.getValue();
-            int t = shortUnsignedAtOffset(value, 0);
-            if (t==0)
-            {
-                readCharacteristic(characteristic);
-            }else {
-                int h = shortUnsignedAtOffset(value, 2);
-                t = t - (t % 4);
-                h = h - (h % 4);
-                float humidity = (-6f) + 125f * (h / 65535f);
-                float temperature = -46.85f + 175.72f / 65536f * (float) t;
-                Log.d(TAG, String.format("Umidità: %d", ((int) humidity)));
-                Log.d(TAG, String.format("Temperatura: %d", ((int) temperature)));
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    broadcastUpdate(characteristic);
-                }
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                broadcastUpdate(characteristic);
             }
         }
 
@@ -305,11 +274,4 @@ public class BluetoothLeService extends Service {
 
         return mBluetoothGatt.getServices();
     }
-
-    private static Integer shortUnsignedAtOffset(byte[] c, int offset) {
-        Integer lowerByte = (int) c[offset] & 0xFF;
-        Integer upperByte = (int) c[offset+1] & 0xFF;
-        return (upperByte << 8) + lowerByte;
-    }
-
 }
