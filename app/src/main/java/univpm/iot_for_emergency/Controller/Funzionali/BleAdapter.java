@@ -1,4 +1,4 @@
-package univpm.iot_for_emergency.Funzionali;
+package univpm.iot_for_emergency.Controller.Funzionali;
 
 
 import univpm.iot_for_emergency.R;
@@ -23,14 +23,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;

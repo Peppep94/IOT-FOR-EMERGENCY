@@ -12,21 +12,24 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".UI.Login">
+        android:theme="@style/AppTheme"
+        android:name="com.orm.SugarApp">
+        <meta-data android:name="DATABASE" android:value="IOT.db" />
+        <meta-data android:name="VERSION" android:value="7" />
+        <meta-data android:name="QUERY_LOG" android:value="true" />
+        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="univpm.iot_for_emergency" />
+
+        <activity android:name=".View.Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".UI.Registrazione" />
-        <activity android:name=".UI.Modifica_dati" />
-
-
-        <activity android:name=".Funzionali.BleAdapter" />
+        <activity android:name=".View.Registrazione" />
+        <activity android:name=".View.Modifica_dati" />
+        <activity android:name=".Controller.Funzionali.BleAdapter" />
         <activity
-            android:name=".UI.Home"
+            android:name=".View.Home"
             android:label="@string/title_activity_home2"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

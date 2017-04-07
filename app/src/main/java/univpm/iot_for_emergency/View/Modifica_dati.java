@@ -1,10 +1,11 @@
-package univpm.iot_for_emergency.UI;
+package univpm.iot_for_emergency.View;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,27 +16,26 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.Calendar;
-import java.util.Date;
-
-import univpm.iot_for_emergency.DbAdapter.Db;
-import univpm.iot_for_emergency.Funzionali.Sessione;
+import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
+import univpm.iot_for_emergency.Controller.ModificaController;
+import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.R;
+
+/**
+ * Created by Giuseppe on 07/04/2017.
+ */
 
 public class Modifica_dati extends AppCompatActivity {
 
 
-    private  String Nome;
-    private String Cognome;
     private String User ;
-    private  String Pass ;
     private String Sesso;
     private String Problemi;
-    private String DataN;
 
     private int contatore=0;
-    private Db db;
+    private ModificaController modificaController;
+    private TabUtente tabUtente;
     private Sessione sessione;
     protected TextView mDateDisplay;
     protected ImageButton mPickDate;
@@ -44,6 +44,8 @@ public class Modifica_dati extends AppCompatActivity {
     protected int mDay;
     protected String sesso;
     protected String problemi;
+    private final static String TAG = ModificaController.class.getSimpleName();
+
 
     protected DatePickerDialog.OnDateSetListener mDateSetListener =
             new DatePickerDialog.OnDateSetListener() {
@@ -70,13 +72,9 @@ public class Modifica_dati extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modifica_dati);
         sessione=new Sessione(this);
-        db=new Db (this);
-
-
-
+        modificaController=new ModificaController();
         User=sessione.user();
-        String[] datiutent=db.getUtente(User);
-
+        tabUtente=modificaController.getDati(User);
         final EditText name=(EditText) findViewById(R.id.UNome);
         final EditText cognome=(EditText) findViewById(R.id.UCognome);
         final EditText username=(EditText) findViewById(R.id.UUser);
@@ -84,25 +82,22 @@ public class Modifica_dati extends AppCompatActivity {
         final EditText confPassword=(EditText) findViewById(R.id.ConfermaUPassword);
         final Button bconfmodifica=(Button) findViewById(R.id.buttonConfModifica);
 
-        final int id= Integer.parseInt(datiutent[0]);
-
         username.setText(User);
-        name.setText(datiutent[2]);
-        cognome.setText(datiutent[3]);
-        password.setText(datiutent[4]);
-        confPassword.setText(datiutent[4]);
+        name.setText(tabUtente.nome);
+        cognome.setText(tabUtente.cognome);
+        password.setText(tabUtente.password);
+        confPassword.setText(tabUtente.password);
 
-         problemi=(datiutent[5]);
-         sesso=(datiutent[7]);
+        problemi=(tabUtente.problemi);
+        sesso=(tabUtente.sesso);
 
-        String[] datasezionata=datiutent[6].split("/");
+        String[] datasezionata=tabUtente.datan.split("/");
 
         mDay= Integer.parseInt(datasezionata[0]);
         mMonth= Integer.parseInt(datasezionata[1])-1;
         mYear= Integer.parseInt(datasezionata[2].trim());
         datepicker();
         spinner();
-
 
         bconfmodifica.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,23 +106,30 @@ public class Modifica_dati extends AppCompatActivity {
                         .append(mDay).append("/")
                         .append(mMonth+1).append("/")
                         .append(mYear).append(" "));
-                String[] controllo = new String[8];
+
+                      TabUtente controllo;
 
                 if (!username.getText().toString().contentEquals(User)) {
-                    controllo=db.getUtente(String.valueOf(username.getText()));
+                    controllo=modificaController.getDati(username.getText().toString());
                 }else
                 {
-                    controllo[1]=null;
+                    controllo=null;
                 }
                 if(String.valueOf(username.getText()).isEmpty() || String.valueOf(password.getText()).isEmpty()){
                     displayToast("I campi username e password sono obbligatori");
                 }else if (!String.valueOf(password.getText()).equals(String.valueOf(confPassword.getText()))){
                     displayToast("Le password non corrispondono");
-                }else if (!(controllo[1]==null)){
+                }else if (controllo!=null){
                     displayToast("Username non disponibile");
                 }else{
-
-                    db.modificaUtente(username.getText().toString(),name.getText().toString(),cognome.getText().toString(),password.getText().toString(),data,problemi,sesso,id);
+                      tabUtente.user=username.getText().toString();
+                      tabUtente.nome=name.getText().toString();
+                      tabUtente.cognome=cognome.getText().toString();
+                      tabUtente.password=password.getText().toString();
+                      tabUtente.datan=data;
+                      tabUtente.problemi=problemi;
+                      tabUtente.sesso=sesso;
+                      tabUtente.save();
                     sessione.UtenteLoggato(true,String.valueOf(username.getText()));
                     displayToast("Modifica avvenuta con successo ");
                     Intent intent = new Intent(Modifica_dati.this, Home.class); //reinderizzo a Home passando il parametro "username"
@@ -161,7 +163,7 @@ public class Modifica_dati extends AppCompatActivity {
         spinnersesso.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adaptersesso, View view,int pos, long id) {
 
-                    Sesso = (String)adaptersesso.getItemAtPosition(pos);
+                Sesso = (String)adaptersesso.getItemAtPosition(pos);
 
 
 
@@ -186,7 +188,7 @@ public class Modifica_dati extends AppCompatActivity {
         spinnerproblemi.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterproblemi, View view,int pos, long id) {
 
-                    Problemi = (String) adapterproblemi.getItemAtPosition(pos);
+                Problemi = (String) adapterproblemi.getItemAtPosition(pos);
 
 
             }
@@ -226,4 +228,7 @@ public class Modifica_dati extends AppCompatActivity {
                         .append(mMonth+1).append("/")
                         .append(mYear).append(" "));
     }
+
+
+
 }

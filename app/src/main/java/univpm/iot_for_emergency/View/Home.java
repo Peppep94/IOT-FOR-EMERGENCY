@@ -1,4 +1,4 @@
-package univpm.iot_for_emergency.UI;
+package univpm.iot_for_emergency.View;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,10 +12,10 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import univpm.iot_for_emergency.Funzionali.BleAdapter;
-import univpm.iot_for_emergency.Funzionali.Sessione;
+import univpm.iot_for_emergency.Controller.Funzionali.BleAdapter;
+import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
+
 
 public class Home extends AppCompatActivity
 
@@ -83,10 +83,10 @@ public class Home extends AppCompatActivity
                 Home.this.startActivity(intent);
             }
         } else if (id == R.id.logout) {
-          loguot();
+            loguot();
         } else if( id==R.id.ricerca)
         {
-            Intent intent = new Intent(Home.this, BleAdapter.class); //reinderizzo a Modificadati
+           Intent intent = new Intent(Home.this, BleAdapter.class); //reinderizzo a Modificadati
             Home.this.startActivity(intent);
         }
 
@@ -101,3 +101,4 @@ public class Home extends AppCompatActivity
         startActivity(new Intent(Home.this,Login.class));
     }
 }
+

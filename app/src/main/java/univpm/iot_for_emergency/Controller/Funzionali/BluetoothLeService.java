@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package univpm.iot_for_emergency.Funzionali;
+package univpm.iot_for_emergency.Controller.Funzionali;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -26,26 +26,17 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.TextView;
 
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import univpm.iot_for_emergency.R;
-
-import static android.R.attr.action;
-import static univpm.iot_for_emergency.R.id.temperatura;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a

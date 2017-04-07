@@ -1,29 +1,26 @@
-package univpm.iot_for_emergency.UI;
+package univpm.iot_for_emergency.View;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
-import univpm.iot_for_emergency.DbAdapter.Db;
+import univpm.iot_for_emergency.Controller.RegistraController;
+import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.R;
-
 
 public class Registrazione extends AppCompatActivity {
 
@@ -35,7 +32,7 @@ public class Registrazione extends AppCompatActivity {
     private String Problemi;
     private String DataN;
 
-    private Db db;
+    private TabUtente tabUtente;
     protected TextView mDateDisplay;
     protected ImageButton mPickDate;
     protected int mYear;
@@ -64,13 +61,12 @@ public class Registrazione extends AppCompatActivity {
     }
 
 
-    //operazioni effettuate automaticamente all'avvio dell'attività
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        db= new Db(this);
         final Button bRegister=(Button) findViewById(R.id.buttonRegistra);
 
         spinner();
@@ -78,11 +74,9 @@ public class Registrazione extends AppCompatActivity {
         bRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              Registra();
+                Registra();
             }
         });
-
-
 
 
     }
@@ -90,15 +84,17 @@ public class Registrazione extends AppCompatActivity {
     public void spinner(){
 
         Spinner spinnersesso = (Spinner)findViewById(R.id.Sesso);
+
         final ArrayAdapter<String> adaptersesso = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_spinner_item,
                 new String[]{"Maschio","Femmina"}
         );
+
         spinnersesso.setAdapter(adaptersesso);
         spinnersesso.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adaptersesso, View view,int pos, long id) {
-                    Sesso = (String)adaptersesso.getItemAtPosition(pos);
+                Sesso = (String)adaptersesso.getItemAtPosition(pos);
             }
             public void onNothingSelected(AdapterView<?> arg0) {
 
@@ -117,7 +113,7 @@ public class Registrazione extends AppCompatActivity {
         spinnerproblemi.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterproblemi, View view,int pos, long id) {
 
-                    Problemi = (String) adapterproblemi.getItemAtPosition(pos);
+                Problemi = (String) adapterproblemi.getItemAtPosition(pos);
 
 
             }
@@ -146,7 +142,17 @@ public class Registrazione extends AppCompatActivity {
         mDay = c.get(Calendar.DAY_OF_MONTH);
         updateDisplay();
     }
-    // richiama l'oggetto db e gli fa inserire un nuovo utente
+
+    //cambia la data mostrata a video
+    protected void updateDisplay() {
+        mDateDisplay.setText(
+                new StringBuilder()
+                        .append(mDay).append("/")
+                        .append(mMonth+1).append("/")
+                        .append(mYear).append(" "));
+    }
+
+
     private void Registra(){
 
         final EditText name=(EditText) findViewById(R.id.Name);
@@ -166,31 +172,30 @@ public class Registrazione extends AppCompatActivity {
                 .append(mDay).append("/")
                 .append(mMonth+1).append("/")
                 .append(mYear).append(" "));
+        RegistraController registraController=new RegistraController();
 
-        String[] controllo=db.getUtente(User);
-        if(User.isEmpty() || Pass.isEmpty()){
-            displayToast("I campi contrassegnati con * non posso essere vuoti");
-        }else if (!Pass.equals(Confpass)){
-            displayToast("Le password non corrispondono");
-        }else if (!(controllo[1] ==null)){
-            displayToast("Username non disponibile");
-        }else{
-           db.InserisciUtenti(User,Nome,Cognome,Pass, DataN,Problemi,Sesso);
-            displayToast("Utente registrato ");
-            finish();
-        }
+        int c=registraController.Registra(User,Nome,Cognome,Pass,DataN,Problemi,Sesso,Confpass);
+
+           switch (c) {
+               case 0:
+               displayToast("I campi contrassegnati con * non posso essere vuoti");
+               break;
+               case 1:
+               displayToast("Le password non corrispondono");
+               break;
+               case 2:
+               displayToast("Username non disponibile");
+               break;
+               case 3:
+               displayToast("Utente registrato ");
+               finish();
+               break;
+           }
+
     }
-    //cambia la data mostrata a video
-    protected void updateDisplay() {
-        mDateDisplay.setText(
-                new StringBuilder()
-                        .append(mDay).append("/")
-                        .append(mMonth+1).append("/")
-                        .append(mYear).append(" "));
-    }
+
     //mostra a video dei messaggi
     public void displayToast(String message){
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(Registrazione.this, message, Toast.LENGTH_SHORT).show();
     }
-
 }
