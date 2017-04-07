@@ -93,7 +93,7 @@ public class BleAdapter extends AppCompatActivity {
         listViewLE.setOnItemClickListener(scanResultOnItemClickListener);
 
         mHandler = new Handler();
-        scanLeDevice(true);
+       // scanLeDevice(true);
 
     }
 
@@ -147,6 +147,8 @@ public class BleAdapter extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        //requestPositionPermission();
 
         if (!mBluetoothAdapter.isEnabled()) {
             if (!mBluetoothAdapter.isEnabled()) {
@@ -259,12 +261,14 @@ public class BleAdapter extends AppCompatActivity {
         }
     };
 
+
+
     private void requestPositionPermission() {
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION)) {
 
-            Snackbar.make(mLayout, "I permessi per la posizione servonpo per effettuare lo scan",
+            Snackbar.make(findViewById(android.R.id.content), "I permessi per la posizione servono per effettuare lo scan",
                     Snackbar.LENGTH_INDEFINITE)
                     .setAction("ok", new View.OnClickListener() {
                         @Override
@@ -281,6 +285,27 @@ public class BleAdapter extends AppCompatActivity {
                     MY_PERMISSIONS_REQUEST);
         }
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        // BEGIN_INCLUDE(onRequestPermissionsResult)
+        if (requestCode == MY_PERMISSIONS_REQUEST) {
+            // Request for camera permission.
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission has been granted. Start camera preview Activity.
+                Snackbar.make(findViewById(android.R.id.content), "I permessi per la posizione sono stati concessi",
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+                scanLeDevice(true);
+            } else {
+                // Permission request was denied.
+                Snackbar.make(findViewById(android.R.id.content), "I permessi per la posizione sono stati negati",
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+        }
     }
 
 
