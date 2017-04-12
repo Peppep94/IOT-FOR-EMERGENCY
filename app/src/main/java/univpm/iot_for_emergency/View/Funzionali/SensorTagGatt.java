@@ -50,7 +50,7 @@
 
 
  **************************************************************************************************/
-package univpm.iot_for_emergency.Controller.Funzionali;
+package univpm.iot_for_emergency.View.Funzionali;
 
 import java.util.UUID;
 

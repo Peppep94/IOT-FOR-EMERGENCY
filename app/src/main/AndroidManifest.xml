@@ -27,7 +27,6 @@
         </activity>
         <activity android:name=".View.Registrazione" />
         <activity android:name=".View.Modifica_dati" />
-        <activity android:name=".Controller.Funzionali.BleAdapter" />
         <activity
             android:name=".View.Home"
             android:label="@string/title_activity_home2"

@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,7 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Calendar;
-import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
+import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.ModificaController;
 import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.R;
@@ -74,7 +73,7 @@ public class Modifica_dati extends AppCompatActivity {
         sessione=new Sessione(this);
         modificaController=new ModificaController();
         User=sessione.user();
-        tabUtente=modificaController.getDati(User);
+        tabUtente=modificaController.getDaticontroller(User);
         final EditText name=(EditText) findViewById(R.id.UNome);
         final EditText cognome=(EditText) findViewById(R.id.UCognome);
         final EditText username=(EditText) findViewById(R.id.UUser);
@@ -110,7 +109,7 @@ public class Modifica_dati extends AppCompatActivity {
                       TabUtente controllo;
 
                 if (!username.getText().toString().contentEquals(User)) {
-                    controllo=modificaController.getDati(username.getText().toString());
+                    controllo=modificaController.getDaticontroller(username.getText().toString());
                 }else
                 {
                     controllo=null;

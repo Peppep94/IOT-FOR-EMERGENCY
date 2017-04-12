@@ -174,7 +174,7 @@ public class Registrazione extends AppCompatActivity {
                 .append(mYear).append(" "));
         RegistraController registraController=new RegistraController();
 
-        int c=registraController.Registra(User,Nome,Cognome,Pass,DataN,Problemi,Sesso,Confpass);
+        int c=registraController.Registracontroller(User,Nome,Cognome,Pass,DataN,Problemi,Sesso,Confpass);
 
            switch (c) {
                case 0:

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package univpm.iot_for_emergency.Controller.Funzionali;
+package univpm.iot_for_emergency.View.Funzionali;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -58,10 +58,6 @@ public class BluetoothLeService extends Service {
     private static final byte[] ENABLE_SENSOR = {0x01};
     private static final UUID UUID_CCC = UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb");
 
-    private static final Queue<Object> sWriteQueue = new ConcurrentLinkedQueue<Object>();
-    private static boolean sIsWriting = false;
-    private BluetoothGatt mGatt = null;
-
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -102,6 +98,7 @@ public class BluetoothLeService extends Service {
           gatt.readCharacteristic(humidityCharacteristic);
 
       }
+
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
@@ -285,17 +282,7 @@ public class BluetoothLeService extends Service {
         }
     }
 
-    /**
-     * Retrieves a list of supported GATT services on the connected device. This should be
-     * invoked only after {@code BluetoothGatt#discoverServices()} completes successfully.
-     *
-     * @return A {@code List} of supported services.
-     */
-    public List<BluetoothGattService> getSupportedGattServices() {
-        if (mBluetoothGatt == null) return null;
 
-        return mBluetoothGatt.getServices();
-    }
 
     private static Integer shortUnsignedAtOffset(byte[] c, int offset) {
         Integer lowerByte = (int) c[offset] & 0xFF;

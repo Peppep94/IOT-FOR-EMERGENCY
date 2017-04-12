@@ -10,8 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import univpm.iot_for_emergency.Controller.Funzionali.BluetoothLeService;
-import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
+import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.R;
 
@@ -79,7 +78,7 @@ public class Login extends AppCompatActivity {
         Pass=password.getText().toString();
         Log.i(TAG, "username "+User);
 
-        if(loginController.controlUserPass(User,Pass)){  //controllo se esiste un utente registrato corrispondente
+        if(loginController.controlUserPasscontroller(User,Pass)){  //controllo se esiste un utente registrato corrispondente
             sessione.UtenteLoggato(true,User); //avvio la sessione
             Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
             intent.putExtra("user", User);
@@ -92,7 +91,7 @@ public class Login extends AppCompatActivity {
     }
 
     private void LoginGuest(){
-        int id=loginController.countUt()+1;
+        int id=loginController.countUtcontroller()+1;
         User="Guest"+id;
         sessione.UtenteLoggato(true,User); //avvio la sessione
 
