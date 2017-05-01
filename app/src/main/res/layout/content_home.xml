@@ -10,13 +10,12 @@
     tools:context=".View.Home">
 
     <TextView
+        android:id="@+id/testoHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Benvenuto"
-        android:id="@+id/textView"
-        android:layout_marginTop="77dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="77dp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

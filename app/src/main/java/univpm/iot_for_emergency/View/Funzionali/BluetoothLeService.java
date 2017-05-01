@@ -79,14 +79,12 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-
             BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
             BluetoothGattCharacteristic humidityCharacteristic = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_DATA);
             BluetoothGattCharacteristic enableHum = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_CONF);
             gatt.setCharacteristicNotification(humidityCharacteristic,true);
-
             enableHum.setValue(ENABLE_SENSOR);
-           gatt.writeCharacteristic(enableHum);
+            gatt.writeCharacteristic(enableHum);
             gatt.readCharacteristic(humidityCharacteristic);
 
         }
@@ -109,51 +107,16 @@ public class BluetoothLeService extends Service {
             {
                 readCharacteristic(characteristic);
             }else {
-                int h = shortUnsignedAtOffset(value, 2);
-                t = t - (t % 4);
-                h = h - (h % 4);
-                float humidity = (-6f) + 125f * (h / 65535f);
-                float temperature = -46.85f + 175.72f / 65536f * (float) t;
-                Log.d(TAG, String.format("Umidità: %d", ((int) humidity)));
-                Log.d(TAG, String.format("Temperatura: %d", ((int) temperature)));
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    broadcastUpdate(characteristic);
-                }
+                broadcastUpdate("univpm.iot_for_emergency.View.Funzionali",t,value);
             }
         }
 
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt,
-                                            BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(characteristic);
-        }
     };
 
 
-    private void broadcastUpdate(final BluetoothGattCharacteristic characteristic) {
 
-        if (SensorTagGatt.UUID_HUM_DATA.equals(characteristic.getUuid())) {
-            int flag = characteristic.getProperties();
-            int format = -1;
-            if ((flag & 0x01) != 0) {
-                format = BluetoothGattCharacteristic.FORMAT_UINT16;
-                Log.d(TAG, "Formato del dato UINT16.");
-            } else {
-                format = BluetoothGattCharacteristic.FORMAT_UINT8;
-                Log.d(TAG, "Formato del dato UINT8.");
-            }
-            final int umidità = characteristic.getIntValue(format, 2);
-            Log.d(TAG, String.format("Dato ricevuto: %d", umidità));
-        } else {
-            // For all other profiles, writes the data formatted in HEX.
-            final byte[] data = characteristic.getValue();
-            if (data != null && data.length > 0) {
-                final StringBuilder stringBuilder = new StringBuilder(data.length);
-                for(byte byteChar : data)
-                    stringBuilder.append(String.format("%02X ", byteChar));
-            }
-        }
-    }
+
+
 
     public class LocalBinder extends Binder {
         BluetoothLeService getService() {
@@ -245,13 +208,6 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt = null;
     }
 
-    /**
-     * Request a read on a given {@code BluetoothGattCharacteristic}. The read result is reported
-     * asynchronously through the {@code BluetoothGattCallback#onCharacteristicRead(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)}
-     * callback.
-     *
-     * @param characteristic The characteristic to read from.
-     */
     public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
@@ -260,34 +216,30 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt.readCharacteristic(characteristic);
     }
 
-    /**
-     * Enables or disables notification on a give characteristic.
-     *
-     * @param characteristic Characteristic to act on.
-     * @param enabled If true, enable notification.  False otherwise.
-     */
-    public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic,
-                                              boolean enabled) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
-        }
-        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
-
-
-        if (SensorTagGatt.UUID_HUM_DATA.equals(characteristic.getUuid())) {
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(SensorTagGatt.UUID_HUM_CONF);
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor);
-        }
-    }
-
-
 
     private static Integer shortUnsignedAtOffset(byte[] c, int offset) {
         Integer lowerByte = (int) c[offset] & 0xFF;
         Integer upperByte = (int) c[offset+1] & 0xFF;
         return (upperByte << 8) + lowerByte;
+    }
+
+    private void broadcastUpdate(final String action,int t,byte[] value) {
+        final Intent intent = new Intent(action);
+        int h = shortUnsignedAtOffset(value, 2);
+        t = t - (t % 4);
+        h = h - (h % 4);
+        float humidity = (-6f) + 125f * (h / 65535f);
+        float temperature = -46.85f + 175.72f / 65536f * (float) t;
+        Log.d(TAG, String.format("Umidità: %d", ((int) humidity)));
+        Log.d(TAG, String.format("Temperatura: %d", ((int) temperature)));
+        intent.putExtra("hum",humidity);
+        intent.putExtra("temp",temperature);
+        sendBroadcast(intent);
+        Log.d(TAG, String.format("Broadcast inviati"));
+        sendBroadcast(intent);
+        disconnect();
+        close();
+
     }
 
 }

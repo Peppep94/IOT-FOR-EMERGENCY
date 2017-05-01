@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">IOT-FOR-EMERGENCY</string>
-    <string name="title_activity_home2">Home</string>
+    <string name="title_activity_home">Home</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="position_permission_request">I permessi per la posizione servono per effettuare lo scan dei dispositivi vicini</string>

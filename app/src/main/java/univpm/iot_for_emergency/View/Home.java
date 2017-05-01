@@ -14,9 +14,11 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,6 +40,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -53,6 +56,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private boolean mScanning;
     private Sessione sessione;
     private String user;
+    private TextView view;
 
     private static final int RQS_ENABLE_BLUETOOTH = 1;
 
@@ -66,6 +70,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        view=(TextView) findViewById(R.id.testoHome);
 
         sessione = new Sessione(this);
 
@@ -115,13 +121,17 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mGattUpdateReceiver);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-       // requestPositionPermission();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        // requestPositionPermission();
     }
 
     @Override
@@ -303,6 +313,24 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         finish();
         startActivity(new Intent(univpm.iot_for_emergency.View.Home.this,Login.class));
     }
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali");
+        return intentFilter;
+    }
+
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, String.format("Broadcast ricevuto"));
+            final String action = intent.getAction();
+            final String control="univpm.iot_for_emergency.View.Funzionali";
+            if (control.equals(action)) {
+                view.setText("Temperatura: "+intent.getStringExtra("temp")+" Umidità: "+intent.getStringExtra("hum"));
+            }
+        }
+    };
 
 
 }

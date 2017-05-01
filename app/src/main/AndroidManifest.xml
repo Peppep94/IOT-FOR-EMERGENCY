@@ -29,8 +29,10 @@
         <activity android:name=".View.Modifica_dati" />
         <activity
             android:name=".View.Home"
-            android:label="@string/title_activity_home2"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
     </application>
     <service android:name=".BluetoothLeService" android:enabled="true"/>
 
