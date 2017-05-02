@@ -15,14 +15,17 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -55,6 +58,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private BluetoothLeService mBluetoothLeService;
     private boolean mScanning;
     private Sessione sessione;
+    boolean mServiceBound = false;
     private String user;
     private TextView view;
 
@@ -122,6 +126,23 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, BluetoothLeService.class);
+        startService(intent);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mServiceBound) {
+            unbindService(mServiceConnection);
+            mServiceBound = false;
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
@@ -131,7 +152,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        // requestPositionPermission();
     }
 
     @Override
@@ -195,8 +215,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             if(result.getDevice().getName().contains("SensorTag")) {
-                mBluetoothLeService.connect(result.getDevice().getAddress(), mBluetoothAdapter);
-                scanLeDevice(false);
+                if(mBluetoothLeService.initialize()) {
+                    mBluetoothLeService.connect(result.getDevice().getAddress());
+                    scanLeDevice(false);
+                }
             }
         }
 
@@ -314,23 +336,41 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         startActivity(new Intent(univpm.iot_for_emergency.View.Home.this,Login.class));
     }
 
-    private static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali");
-        return intentFilter;
-    }
-
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, String.format("Broadcast ricevuto"));
             final String action = intent.getAction();
-            final String control="univpm.iot_for_emergency.View.Funzionali";
+            final String control="android.intent.action.MAIN";
             if (control.equals(action)) {
-                view.setText("Temperatura: "+intent.getStringExtra("temp")+" Umidità: "+intent.getStringExtra("hum"));
+                int ciao=(int)intent.getFloatExtra("hum",1000);
+                int cione=(int)intent.getFloatExtra("temp",1000);
+                Log.d(TAG, "Valore ricevuto dal broadcast umidità"+ (int)ciao);
+                Log.d(TAG, "Valore ricevuto dal broadcast temperatura "+ (int)cione);
+                view.setText("Temperatura "+String.valueOf(cione)+" Umidità "+ String.valueOf(ciao));
             }
         }
     };
 
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.intent.action.MAIN");
+        return intentFilter;
+    }
+
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mServiceBound = false;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            BluetoothLeService.MyBinder myBinder = (BluetoothLeService.MyBinder) service;
+            mBluetoothLeService = myBinder.getService();
+            mServiceBound = true;
+        }
+    };
 
 }
