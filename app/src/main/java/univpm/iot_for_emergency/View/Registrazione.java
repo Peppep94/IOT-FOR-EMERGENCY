@@ -147,6 +147,7 @@ public class Registrazione extends AppCompatActivity {
     protected void updateDisplay() {
         mDateDisplay.setText(
                 new StringBuilder()
+                        .append("  ")
                         .append(mDay).append("/")
                         .append(mMonth+1).append("/")
                         .append(mYear).append(" "));
@@ -169,6 +170,7 @@ public class Registrazione extends AppCompatActivity {
         String Confpass = confPassword.getText().toString();
 
         DataN =  String.valueOf(new StringBuilder()
+                .append("  ")
                 .append(mDay).append("/")
                 .append(mMonth+1).append("/")
                 .append(mYear).append(" "));

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/sfondo2"
     tools:context=".View.Modifica_dati"
     >
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -17,53 +18,61 @@
         >
 
         <EditText
+            android:id="@+id/UNome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/UNome"
-            android:layout_marginTop="47dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-             />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="47dp"
+            android:background="@drawable/text_rounded_corners"
+
+            android:textAlignment="center" />
 
         <EditText
+            android:id="@+id/UUser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/UUser"
-            android:layout_below="@+id/UProblemi"
+            android:layout_alignEnd="@+id/UPassword"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="false"
-            android:layout_marginTop="23dp"
             android:layout_alignRight="@+id/UPassword"
-            android:layout_alignEnd="@+id/UPassword" />
+            android:layout_below="@+id/UProblemi"
+            android:layout_marginTop="23dp"
+            android:background="@drawable/text_rounded_corners"
+            android:textAlignment="center" />
 
         <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
             android:id="@+id/UPassword"
-            android:layout_below="@+id/UUser"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="24dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            />
-
-        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/UUser"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/text_rounded_corners"
+            android:ems="10"
             android:inputType="textPassword"
+
+            android:textAlignment="center" />
+
+        <EditText
             android:id="@+id/ConfermaUPassword"
-            android:layout_below="@+id/UPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/UPassword"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="23dp"
             android:layout_alignRight="@+id/UPassword"
-            android:layout_alignEnd="@+id/UPassword" />
+            android:layout_below="@+id/UPassword"
+            android:layout_marginTop="23dp"
+            android:background="@drawable/text_rounded_corners"
+            android:inputType="textPassword"
+            android:textAlignment="center" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -73,7 +82,8 @@
             android:id="@+id/textViewModificadatiutente"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="20dp"
+            />
 
         <TextView
             android:layout_width="wrap_content"
@@ -84,83 +94,100 @@
             android:layout_gravity="center_vertical"
             android:layout_marginTop="21dp"
             android:layout_below="@+id/ConfermaUPassword"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/text_rounded_corners"
+            />
 
         <Button
+            android:id="@+id/buttonConfModifica"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Conferma"
-            android:id="@+id/buttonConfModifica"
             android:layout_below="@+id/buttonUData"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="23dp" />
+            android:layout_marginTop="23dp"
+            android:background="@drawable/button_rounded_corners"
+            android:text="Conferma"
+            />
 
         <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/UCognome"
-            android:layout_below="@+id/UNome"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="27dp"
-            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-             />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/UNome"
+            android:layout_marginTop="27dp"
+            android:background="@drawable/text_rounded_corners"
+
+            android:textAlignment="center" />
 
         <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/USesso"
-            android:layout_marginTop="37dp"
-
-            android:layout_below="@+id/textView4"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:layout_below="@+id/textView4"
+            android:layout_marginTop="37dp"
+            android:background="@drawable/text_rounded_corners"
+            android:spinnerMode="dialog" />
+
+        <Spinner
             android:id="@+id/UProblemi"
-            android:layout_marginTop="31dp"
-
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
             android:layout_below="@+id/textView5"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
+            android:layout_marginTop="31dp"
+            android:background="@drawable/text_rounded_corners"
+            android:spinnerMode="dialog" />
 
 
         <ImageButton
+            android:id="@+id/buttonUData"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/buttonUData"
             android:layout_below="@+id/UData"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="17dp"
-            android:src="@drawable/calendario"
-            android:background="@null" />
+            android:background="@null"
+            android:elevation="23dp"
+            android:src="@drawable/calendario" />
 
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Sesso"
             android:id="@+id/textView4"
-            android:layout_below="@+id/UCognome"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="24dp" />
-
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Problema"
-            android:id="@+id/textView5"
-            android:layout_below="@+id/USesso"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="27dp" />
+            android:layout_below="@+id/UCognome"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/text_rounded_corners"
+            android:text="Sesso"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/USesso"
+            android:layout_marginTop="27dp"
+            android:background="@drawable/text_rounded_corners"
+            android:text="Problema"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 </ScrollView>

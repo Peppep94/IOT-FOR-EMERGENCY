@@ -92,7 +92,8 @@ public class Modifica_dati extends AppCompatActivity {
 
         String[] datasezionata=tabUtente.datan.split("/");
 
-        mDay= Integer.parseInt(datasezionata[0]);
+
+        mDay= Integer.parseInt(datasezionata[0].trim());
         mMonth= Integer.parseInt(datasezionata[1])-1;
         mYear= Integer.parseInt(datasezionata[2].trim());
         datepicker();
@@ -102,6 +103,7 @@ public class Modifica_dati extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String data= String.valueOf(new StringBuilder()
+                        .append("  ")
                         .append(mDay).append("/")
                         .append(mMonth+1).append("/")
                         .append(mYear).append(" "));
@@ -223,6 +225,7 @@ public class Modifica_dati extends AppCompatActivity {
     protected void updateDisplay() {
         mDateDisplay.setText(
                 new StringBuilder()
+                        .append("  ")
                         .append(mDay).append("/")
                         .append(mMonth+1).append("/")
                         .append(mYear).append(" "));
