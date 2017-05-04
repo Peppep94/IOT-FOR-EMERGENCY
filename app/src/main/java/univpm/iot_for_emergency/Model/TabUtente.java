@@ -3,7 +3,9 @@ package univpm.iot_for_emergency.Model;
 import com.orm.SugarRecord;
 
 import java.util.List;
-
+/*
+Classe che rappresenta l'utente, per la sua realizzazione è stato usato SugarOrm (per la sintassi fare riferimento a http://satyan.github.io/sugar/)
+ */
 public class TabUtente extends SugarRecord {
 
      public String nome ;

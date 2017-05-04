@@ -27,8 +27,8 @@ public class BluetoothLeService extends Service {
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
-    private int mConnectionState = STATE_DISCONNECTED;
 
+    private int mConnectionState = STATE_DISCONNECTED;
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
@@ -67,13 +67,6 @@ public class BluetoothLeService extends Service {
         Log.v(LOG_TAG, "in onDestroy");
     }
 
-
-    public void sendBRoadcast(){
-        Intent intent=new Intent();
-        intent.setAction("android.intent.action.MAIN");
-        intent.putExtra("contenuto","Sono Giuseppe");
-        sendBroadcast(intent);
-    }
 
     public class MyBinder extends Binder {
         public BluetoothLeService getService() {
@@ -139,6 +132,7 @@ public class BluetoothLeService extends Service {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mConnectionState = STATE_CONNECTED;
+                broadcasUpdate("univpm.iot_for_emergency.View.Funzionali.Connesso",gatt.getDevice().getAddress());
                 Log.i(TAG, "Connected to GATT server.");
                 Log.i(TAG, "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
 
@@ -157,7 +151,6 @@ public class BluetoothLeService extends Service {
             gatt.setCharacteristicNotification(humidityCharacteristic,true);
             enableHum.setValue(ENABLE_SENSOR);
             gatt.writeCharacteristic(enableHum);
-            gatt.readCharacteristic(humidityCharacteristic);
 
         }
         @Override
@@ -179,7 +172,7 @@ public class BluetoothLeService extends Service {
             {
                 readCharacteristic(characteristic);
             }else {
-                broadcastUpdate("android.intent.action.MAIN",t,value);
+                broadcastUpdate("univpm.iot_for_emergency.View.Funzionali.Ricevuti",characteristic);
             }
         }
 
@@ -191,24 +184,27 @@ public class BluetoothLeService extends Service {
         return (upperByte << 8) + lowerByte;
     }
 
-    private void broadcastUpdate(final String action,int t,byte[] value) {
+    private void broadcastUpdate(final String action,BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-        int h = shortUnsignedAtOffset(value, 2);
-        t = t - (t % 4);
-        h = h - (h % 4);
-        float humidity = (-6f) + 125f * (h / 65535f)-13;
-        float temperature = -46.85f + 175.72f / 65536f * (float) t;
-        Log.d(TAG, String.format("Umidità: %d", ((int) humidity)));
-        Log.d(TAG, String.format("Temperatura: %d", ((int) temperature)));
+        double humidity = SensorTagData.extractHumidity(characteristic);
+        double temperature = SensorTagData.extractHumAmbientTemperature(characteristic);
         intent.putExtra("hum",humidity);
         intent.putExtra("temp",temperature);
         sendBroadcast(intent);
-        Log.d(TAG, String.format("Broadcast inviati"));
-        sendBroadcast(intent);
         disconnect();
         close();
+    }
 
+    private void broadcasUpdate(final String action,String device){
+        final Intent intent =new Intent(action);
+        intent.putExtra("device",device);
+        sendBroadcast(intent);
 
+    }
+
+    public void broadcastUpdate(final String action){
+        Intent intent=new Intent(action);
+        sendBroadcast(intent);
     }
 
     public void disconnect() {

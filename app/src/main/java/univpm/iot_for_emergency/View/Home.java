@@ -5,9 +5,7 @@ import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -17,7 +15,6 @@ import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -29,8 +26,6 @@ import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -38,15 +33,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 import java.util.List;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 
@@ -56,14 +43,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private BluetoothLeService mBluetoothLeService;
+    private boolean mConnected;
     private boolean mScanning;
     private Sessione sessione;
     boolean mServiceBound = false;
     private String user;
-    private TextView view;
+    private Toolbar toolbar;
 
     private static final int RQS_ENABLE_BLUETOOTH = 1;
-
     private Handler mHandler;
     private static final long SCAN_PERIOD = 10000;
     private final static String TAG = univpm.iot_for_emergency.View.Home.class.getSimpleName();
@@ -72,10 +59,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        view=(TextView) findViewById(R.id.testoHome);
 
         sessione = new Sessione(this);
 
@@ -83,13 +68,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             loguot();
         }
         user=sessione.user();
-
-        mBluetoothLeService=new BluetoothLeService();
-
-        requestPositionPermission();
-
-        int permissionCheck = ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION);
-
 
         // Controllo se il BLE è supportato
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -112,7 +90,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
 
         mHandler = new Handler();
-        // scanLeDevice(true);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -152,6 +130,15 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        if(mBluetoothAdapter.isEnabled()) {
+            scanLeDevice(true);
+            toolbar.setTitle("Scanning...");
+        }
+        else
+        {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, RQS_ENABLE_BLUETOOTH);
+        }
     }
 
     @Override
@@ -167,7 +154,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         if (requestCode== RQS_ENABLE_BLUETOOTH &&resultCode == RESULT_OK) {
             Log.i(TAG, "Bluetooth acceso");
-            requestPositionPermission();
+          scanLeDevice(true);
         }
 
 
@@ -176,9 +163,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void getBluetoothAdapterAndLeScanner(){
-        // BluetoothAdapter e BluetoothLeScanner.
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
         mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         mScanning = false;
@@ -197,6 +182,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 @Override
                 public void run() {
                     mBluetoothLeScanner.stopScan(scanCallback);
+                    if(toolbar.getTitle().equals("Scanning...") && !mConnected)
+                        toolbar.setTitle("Beacon not found");
                     mScanning = false;
                 }
             }, SCAN_PERIOD);
@@ -217,6 +204,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             if(result.getDevice().getName().contains("SensorTag")) {
                 if(mBluetoothLeService.initialize()) {
                     mBluetoothLeService.connect(result.getDevice().getAddress());
+                    mConnected=true;
                     scanLeDevice(false);
                 }
             }
@@ -238,12 +226,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     };
 
 
+/*
+    private void requestPermission() {
 
-    private void requestPositionPermission() {
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
             Snackbar.make(findViewById(android.R.id.content), "I permessi per la posizione servono per effettuare lo scan",
                     Snackbar.LENGTH_INDEFINITE)
                     .setAction("Dai permessi", new View.OnClickListener() {
@@ -269,12 +255,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         if (requestCode == MY_PERMISSIONS_REQUEST) {
             // Request for camera permission.
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission has been granted. Start camera preview Activity.
-                Snackbar.make(findViewById(android.R.id.content), "I permessi per la posizione sono stati concessi",
-                        Snackbar.LENGTH_SHORT)
-                        .show();
-                if(mBluetoothAdapter.isEnabled())
-                     scanLeDevice(true);
+                if(mBluetoothAdapter.isEnabled()) {
+                    scanLeDevice(true);
+                    toolbar.setTitle("Scanning...");
+                }
                 else {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, RQS_ENABLE_BLUETOOTH);
@@ -285,10 +269,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 Snackbar.make(findViewById(android.R.id.content), "I permessi per la posizione sono stati negati",
                         Snackbar.LENGTH_SHORT)
                         .show();
+
             }
         }
     }
-
+*/
 
 
     @Override
@@ -320,9 +305,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         } else if (id == R.id.logout) {
             loguot();
-        } else if (id==R.id.ricerca) {
-            Intent intent = new Intent(univpm.iot_for_emergency.View.Home.this, Home.class); //reinderizzo a Modificadati
-            univpm.iot_for_emergency.View.Home.this.startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -340,20 +322,28 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            final String control="android.intent.action.MAIN";
-            if (control.equals(action)) {
-                int ciao=(int)intent.getFloatExtra("hum",1000);
-                int cione=(int)intent.getFloatExtra("temp",1000);
-                Log.d(TAG, "Valore ricevuto dal broadcast umidità"+ (int)ciao);
-                Log.d(TAG, "Valore ricevuto dal broadcast temperatura "+ (int)cione);
-                view.setText("Temperatura "+String.valueOf(cione)+" Umidità "+ String.valueOf(ciao));
+            if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
+                int humidity=(int)intent.getDoubleExtra("hum",1000);
+                int temperature=(int)intent.getDoubleExtra("temp",1000);
+                toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
+                mConnected=false;
+
+            }else if(("univpm.iot_for_emergency.View.Funzionali.Connesso").equals(action)) {
+                mConnected=true;
+                String device=intent.getStringExtra("device");
+                Snackbar.make(findViewById(android.R.id.content), "Connesso a "+device,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
             }
         }
     };
 
+
+
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("android.intent.action.MAIN");
+        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Ricevuti");
+        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Connesso");
         return intentFilter;
     }
 

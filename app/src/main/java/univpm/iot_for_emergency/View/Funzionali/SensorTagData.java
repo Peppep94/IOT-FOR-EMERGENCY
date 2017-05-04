@@ -15,7 +15,7 @@ public class SensorTagData {
         // bits [1..0] are status bits and need to be cleared
         a = a - (a % 4);
 
-        return ((-6f) + 125f * (a / 65535f));
+        return ((-6f) + 125f * (a / 65535f))-12;
     }
 
     public static int[] extractCalibrationCoefficients(BluetoothGattCharacteristic c) {
