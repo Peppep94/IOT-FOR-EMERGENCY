@@ -2,6 +2,8 @@ package univpm.iot_for_emergency.View.Funzionali;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 
+
+/*Classe contenente gli algoritmi che convertono i dati grezzi ricevuti dal beacon nei dati di cui abbiamo bisogno*/
 public class SensorTagData {
 
     public static double extractHumAmbientTemperature(BluetoothGattCharacteristic c) {

@@ -35,7 +35,7 @@ public class Login extends AppCompatActivity {
         final TextView registerLink = (TextView) findViewById(R.id.RegisterHere);
 
 
-        controlloPrimoAvvio();  // controlla se la sessione è arriva nel caso lo fosse reindirizza ad Home
+        controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
 
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override

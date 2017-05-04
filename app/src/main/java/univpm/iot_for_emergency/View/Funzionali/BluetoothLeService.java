@@ -19,6 +19,8 @@ import android.util.Log;
 
 import static android.content.ContentValues.TAG;
 
+
+/*Service che si occupa di connettere e leggere i dati dal Beacon.*/
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BluetoothLeService extends Service {
     private static String LOG_TAG = "BluetoothLeService";
@@ -77,16 +79,15 @@ public class BluetoothLeService extends Service {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public boolean initialize() {
-        // For API level 18 and above, get a reference to BluetoothAdapter through
-        // BluetoothManager.
-        if (mBluetoothManager == null) {
+
+        if (mBluetoothManager == null) { /* Provo ad istanziare il BluettoothManager da cui prenderò il BluetoothAdapter */
             mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             if (mBluetoothManager == null) {
                 Log.e(TAG, "Unable to initialize BluetoothManager.");
                 return false;
             }
         }
-
+           /* Provo ad istanziare il BluettoothAdapeter */
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         if (mBluetoothAdapter == null) {
             Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
@@ -94,14 +95,13 @@ public class BluetoothLeService extends Service {
         }
         return true;
     }
-
+    /* Connessione a dispositivo*/
     public boolean connect(final String address) {
         if (mBluetoothAdapter == null || address == null) {
             Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
 
-        // Previously connected device.  Try to reconnect.
         if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {
             Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
@@ -118,8 +118,7 @@ public class BluetoothLeService extends Service {
             Log.w(TAG, "Device not found.  Unable to connect.");
             return false;
         }
-        // We want to directly connect to the device, so we are setting the autoConnect
-        // parameter to false.
+
         mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
         Log.d(TAG, "Trying to create a new connection.");
         mBluetoothDeviceAddress = address;
@@ -127,7 +126,11 @@ public class BluetoothLeService extends Service {
         return true;
     }
 
+
+    /*Messaggio di risposta ottenuto dopo le interazioni col dispositivo*/
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+
+        /*Metodo che viene richiamato quando cambia lo stato della connessione (da non connesso passo a connesso e viceversa) */
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
@@ -143,35 +146,47 @@ public class BluetoothLeService extends Service {
             gatt.discoverServices();
         }
 
+
+        /*Metodo che viene richiamato una volta che sono stati scoperti i servizi offerti dal dispositivo */
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            /* Mi associo al service che mi interessa*/
             BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
-            BluetoothGattCharacteristic humidityCharacteristic = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_DATA);
+
+            /* Mi associo ala caratteristica che mi interessa*/
             BluetoothGattCharacteristic enableHum = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_CONF);
-            gatt.setCharacteristicNotification(humidityCharacteristic,true);
+
+            /*Assegno alla caratteristica desiderata il valore che accende il sensore*/
             enableHum.setValue(ENABLE_SENSOR);
+
+            /*Invio il dato al sensore*/
             gatt.writeCharacteristic(enableHum);
 
         }
+
+        /*Metodo che viene richiamato una volta che sono stati iviati dati al dispositivo */
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status){
-            Log.i(TAG, "Ho scritto la caratteristica "+characteristic.getPermissions());
             BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
+
             BluetoothGattCharacteristic humidityCharacteristic = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_DATA);
+
+            /*richiedo di leggere il valore della caratteristica*/
             gatt.readCharacteristic(humidityCharacteristic);
 
         }
-
+        /*Metodo che viene richiamato una volta che sono stati richiesti i dati al dispositivo*/
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            Log.i(TAG, "Ho letto la caratteristica");
+            /*Controllo se il valore è uguale a 0, se è così vuol dire che abbiamo preso il valore prima che il sensore si accendesse quindi provo a leggere di nuovo */
             byte []value=characteristic.getValue();
             int t = shortUnsignedAtOffset(value, 0);
             if (t==0)
             {
-                readCharacteristic(characteristic);
+                gatt.readCharacteristic(characteristic);
             }else {
+                /*se il valore ricevuto è diverso da 0 abbiamo letto i dati e li inviamo alla home */
                 broadcastUpdate("univpm.iot_for_emergency.View.Funzionali.Ricevuti",characteristic);
             }
         }
@@ -184,6 +199,8 @@ public class BluetoothLeService extends Service {
         return (upperByte << 8) + lowerByte;
     }
 
+
+    /*Tutte le funzioni broadcast inviano un intent caratterizzato da un'azione e da dari dati, il receiver della home si comporta in modo diverso in base all'azione dell'intent */
     private void broadcastUpdate(final String action,BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
         double humidity = SensorTagData.extractHumidity(characteristic);
@@ -227,11 +244,5 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt = null;
     }
 
-    public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
-        }
-        mBluetoothGatt.readCharacteristic(characteristic);
-    }
+
 }
