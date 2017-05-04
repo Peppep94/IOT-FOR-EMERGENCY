@@ -33,6 +33,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import java.util.List;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -49,6 +51,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     boolean mServiceBound = false;
     private String user;
     private Toolbar toolbar;
+    private ProgressBar progressbar;
 
     private static final int RQS_ENABLE_BLUETOOTH = 1;
     private Handler mHandler;
@@ -61,7 +64,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         setContentView(R.layout.activity_home);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        progressbar=(ProgressBar) findViewById(R.id.progressBar);
         sessione = new Sessione(this);
 
         if (!sessione.loggedin()) {
@@ -133,6 +136,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         if(mBluetoothAdapter.isEnabled()) {
             scanLeDevice(true);
             toolbar.setTitle("Scanning...");
+            progressbar.setVisibility(View.VISIBLE);
         }
         else
         {
@@ -182,8 +186,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 @Override
                 public void run() {
                     mBluetoothLeScanner.stopScan(scanCallback);
-                    if(toolbar.getTitle().equals("Scanning...") && !mConnected)
+                    if(toolbar.getTitle().equals("Scanning...") && !mConnected){
                         toolbar.setTitle("Beacon not found");
+                        progressbar.setVisibility(View.INVISIBLE);
+                }
                     mScanning = false;
                 }
             }, SCAN_PERIOD);
@@ -325,6 +331,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
                 int humidity=(int)intent.getDoubleExtra("hum",1000);
                 int temperature=(int)intent.getDoubleExtra("temp",1000);
+                progressbar.setVisibility(View.INVISIBLE);
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
                 mConnected=false;
 
