@@ -1,6 +1,9 @@
 package univpm.iot_for_emergency.View;
 
 
+import univpm.iot_for_emergency.Controller.HomeController;
+import univpm.iot_for_emergency.Model.TabBeacon;
+import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
@@ -36,7 +39,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
+
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,7 +59,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private String user;
     private Toolbar toolbar;
     private ProgressBar progressbar;
-
+    private String Device;
     private static final int RQS_ENABLE_BLUETOOTH = 1;
     private Handler mHandler;
     private static final long SCAN_PERIOD = 10000;
@@ -136,6 +143,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         if(mBluetoothAdapter.isEnabled()) {
             scanLeDevice(true);
             toolbar.setTitle("Scanning...");
+            toolbar.setSubtitle("");
             progressbar.setVisibility(View.VISIBLE);
         }
         else
@@ -187,7 +195,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 public void run() {
                     mBluetoothLeScanner.stopScan(scanCallback);
                     if(toolbar.getTitle().equals("Scanning...") && !mConnected){
-                        toolbar.setTitle("Beacon not found");
+                        HomeController homeController=new HomeController();
+                        TabBeacon tabBeacon=homeController.getTabBeacon(Device);
+                        toolbar.setTitle("Temperatura "+String.valueOf(tabBeacon.temperature)+"° Umidità "+ String.valueOf(tabBeacon.humidity)+"%");
+                        toolbar.setSubtitle(("Aggiornato il "+ tabBeacon.dateTime));
                         progressbar.setVisibility(View.INVISIBLE);
                 }
                     mScanning = false;
@@ -209,7 +220,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             super.onScanResult(callbackType, result);
             if(result.getDevice().getName().contains("SensorTag")) {
                 if(mBluetoothLeService.initialize()) {
-                    mBluetoothLeService.connect(result.getDevice().getAddress());
+                    Device=result.getDevice().getAddress();
+                    mBluetoothLeService.connect(Device);
                     mConnected=true;
                     scanLeDevice(false);
                 }
@@ -333,6 +345,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 int temperature=(int)intent.getDoubleExtra("temp",1000);
                 progressbar.setVisibility(View.INVISIBLE);
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
+                String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
+                HomeController homeController=new HomeController();
+                homeController.updatesaveBeacon(Device,currentDateTimeString,String.valueOf(temperature),String.valueOf(humidity));
                 mConnected=false;
 
             }else if(("univpm.iot_for_emergency.View.Funzionali.Connesso").equals(action)) {
