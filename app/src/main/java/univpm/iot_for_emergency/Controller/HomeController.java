@@ -11,9 +11,10 @@ public class HomeController {
     }
 
     public void updatesaveBeacon(String address, String datetime,String temperature,String humidity){
+
          tabBeacon=getTabBeacon(address);
 
-         if(tabBeacon.equals(null)){
+         if(tabBeacon.address.equals("0")){
              tabBeacon=new TabBeacon(address,datetime,temperature,humidity);
              tabBeacon.save();
          }else

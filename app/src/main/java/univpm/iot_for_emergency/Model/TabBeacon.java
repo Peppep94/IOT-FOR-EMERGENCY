@@ -26,12 +26,12 @@ public class TabBeacon extends SugarRecord{
 
     public TabBeacon getDati(String address){
 
-        List<TabBeacon> list =TabUtente.find(TabBeacon.class,"address=?",address);
+        List<TabBeacon> list =TabBeacon.find(TabBeacon.class,"address=?",address);
 
         if (list.size()>0)
             return list.get(0);
         else
-            return null;
+            return new TabBeacon("0","0","0","0");
 
     }
 
