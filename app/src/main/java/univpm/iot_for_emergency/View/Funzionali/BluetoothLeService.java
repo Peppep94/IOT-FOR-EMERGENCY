@@ -22,6 +22,7 @@ import static android.content.ContentValues.TAG;
 
 /*Service che si occupa di connettere e leggere i dati dal Beacon.*/
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+
 public class BluetoothLeService extends Service {
     private static String LOG_TAG = "BluetoothLeService";
     private IBinder mBinder = new MyBinder();

@@ -1,9 +1,11 @@
 package univpm.iot_for_emergency.View;
 
 
+import uk.co.senab.photoview.PhotoViewAttacher;
 import univpm.iot_for_emergency.Controller.HomeController;
-import univpm.iot_for_emergency.Model.TabBeacon;
+import univpm.iot_for_emergency.Model.TabDatiBeacon;
 import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
+import univpm.iot_for_emergency.View.Funzionali.Mappa;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
 
@@ -37,7 +39,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.text.DateFormat;
 import java.util.Date;
@@ -63,7 +68,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private Handler mHandler;
     private static final long SCAN_PERIOD = 10000;
     private final static String TAG = univpm.iot_for_emergency.View.Home.class.getSimpleName();
-
+    private Mappa imageView=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +77,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         setSupportActionBar(toolbar);
         progressbar=(ProgressBar) findViewById(R.id.progressBar);
         sessione = new Sessione(this);
+        imageView = (Mappa) findViewById(R.id.mappa);
 
         if (!sessione.loggedin()) {
             loguot();
@@ -203,9 +209,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                             toolbar.setTitle("Beacon not found");
                         else {
                         HomeController homeController=new HomeController();
-                        TabBeacon tabBeacon=homeController.getTabBeacon(Device);
-                        toolbar.setTitle("Temperatura "+String.valueOf(tabBeacon.temperature)+"° Umidità "+ String.valueOf(tabBeacon.humidity)+"%");
-                        toolbar.setSubtitle(("Aggiornato il "+ tabBeacon.dateTime));
+                        TabDatiBeacon tabDatiBeacon =homeController.getTabBeacon(Device);
+                        toolbar.setTitle("Temperatura "+String.valueOf(tabDatiBeacon.temperature)+"° Umidità "+ String.valueOf(tabDatiBeacon.humidity)+"%");
+                        toolbar.setSubtitle(("Aggiornato il "+ tabDatiBeacon.dateTime));
+                            imageView.init();
+                            PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
+                            photoViewAttacher.update();
                         }
                         progressbar.setVisibility(View.INVISIBLE);
                 }
@@ -349,6 +358,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
                 String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                 toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
+                imageView.init();
+                PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
+                photoViewAttacher.update();
                 HomeController homeController=new HomeController();
                 homeController.updatesaveBeacon(Device,currentDateTimeString,String.valueOf(temperature),String.valueOf(humidity));
                 mConnected=false;

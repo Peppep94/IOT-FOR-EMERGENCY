@@ -1,28 +1,28 @@
 package univpm.iot_for_emergency.Controller;
 
-import univpm.iot_for_emergency.Model.TabBeacon;
+import univpm.iot_for_emergency.Model.TabDatiBeacon;
 
 public class HomeController {
 
-    private TabBeacon tabBeacon=new TabBeacon();
+    private TabDatiBeacon tabDatiBeacon =new TabDatiBeacon();
 
-    public TabBeacon getTabBeacon(String address){
-        return tabBeacon.getDati(address);
+    public TabDatiBeacon getTabBeacon(String address){
+        return tabDatiBeacon.getDati(address);
     }
 
     public void updatesaveBeacon(String address, String datetime,String temperature,String humidity){
 
-         tabBeacon=getTabBeacon(address);
+         tabDatiBeacon =getTabBeacon(address);
 
-         if(tabBeacon.address.equals("0")){
-             tabBeacon=new TabBeacon(address,datetime,temperature,humidity);
-             tabBeacon.save();
+         if(tabDatiBeacon.address.equals("0")){
+             tabDatiBeacon =new TabDatiBeacon(address,datetime,temperature,humidity);
+             tabDatiBeacon.save();
          }else
          {
-             tabBeacon.dateTime=datetime;
-             tabBeacon.temperature=temperature;
-             tabBeacon.humidity=humidity;
-             tabBeacon.save();
+             tabDatiBeacon.dateTime=datetime;
+             tabDatiBeacon.temperature=temperature;
+             tabDatiBeacon.humidity=humidity;
+             tabDatiBeacon.save();
          }
           }
 }

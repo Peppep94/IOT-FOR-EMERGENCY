@@ -5,16 +5,16 @@ import com.orm.SugarRecord;
 
 import java.util.List;
 
-public class TabBeacon extends SugarRecord{
+public class TabDatiBeacon extends SugarRecord{
 
     public String address;
     public String dateTime;
     public String temperature;
     public String humidity;
 
-    public TabBeacon(){}
+    public TabDatiBeacon(){}
 
-    public TabBeacon(String address, String dateTime,String temperature,String humidity){
+    public TabDatiBeacon(String address, String dateTime, String temperature, String humidity){
 
         this.address = address;
         this.dateTime = dateTime;
@@ -24,14 +24,14 @@ public class TabBeacon extends SugarRecord{
     }
 
 
-    public TabBeacon getDati(String address){
+    public TabDatiBeacon getDati(String address){
 
-        List<TabBeacon> list =TabBeacon.find(TabBeacon.class,"address=?",address);
+        List<TabDatiBeacon> list = TabDatiBeacon.find(TabDatiBeacon.class,"address=?",address);
 
         if (list.size()>0)
             return list.get(0);
         else
-            return new TabBeacon("0","0","0","0");
+            return new TabDatiBeacon("0","0","0","0");
 
     }
 
