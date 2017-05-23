@@ -11,7 +11,6 @@ import univpm.iot_for_emergency.R;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -24,7 +23,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,20 +38,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-
-import static android.R.attr.uiOptions;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 
@@ -85,6 +78,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         progressbar=(ProgressBar) findViewById(R.id.progressBar);
         sessione = new Sessione(this);
         imageView = (Mappa) findViewById(R.id.mappa);
+
         if (!sessione.loggedin()) {
             loguot();
         }
@@ -218,16 +212,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                         TabDatiBeacon tabDatiBeacon =homeController.getTabBeacon(Device);
                         toolbar.setTitle("Temperatura "+String.valueOf(tabDatiBeacon.temperature)+"° Umidità "+ String.valueOf(tabDatiBeacon.humidity)+"%");
                         toolbar.setSubtitle(("Aggiornato il "+ tabDatiBeacon.dateTime));
-                            imageView.init(toolbar);
+                            imageView.init();
                             PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
                             photoViewAttacher.update();
-                            photoViewAttacher.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
-                                @Override
-                                public void onViewTap(View view, float v, float v1) {
-                                    String posizione = "(" + Math.round(v) + "," + Math.round(v1) + ")";
-                                    Log.e("dp ", "Posizione " + posizione);
-                                }
-                            });
                         }
                         progressbar.setVisibility(View.INVISIBLE);
                 }
@@ -362,7 +349,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(final Context context, Intent intent) {
+        public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
                 int humidity=(int)intent.getDoubleExtra("hum",1000);
@@ -371,38 +358,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
                 String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                 toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
-                imageView.init(toolbar);
+                imageView.init();
                 PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
                 photoViewAttacher.update();
-                photoViewAttacher.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
-                    @Override
-                    public void onViewTap(View view, float v, float v1) {
-                        String posizione = "(" + Math.round(v) + "," + Math.round(v1) + ")";
-                        Log.e("dp ", "Posizione " + posizione);
-                        final Dialog dialog = new Dialog(context);
-                        dialog.setContentView(R.layout.custom_dialog);
-                        dialog.setTitle("Title...");
-                        TextView text = (TextView) dialog.findViewById(R.id.message);
-                        text.setText("Android custom dialog example!");
-                        Button dialogButton = (Button) dialog.findViewById(R.id.ok);
-                        // if button is clicked, close the custom dialog
-                        dialogButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        });
-                        dialog.show();
-                    }
-                });
-
-                photoViewAttacher.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        fullScreen();
-                        return false;
-                    }
-                });
                 HomeController homeController=new HomeController();
                 homeController.updatesaveBeacon(Device,currentDateTimeString,String.valueOf(temperature),String.valueOf(humidity));
                 mConnected=false;
@@ -441,54 +399,5 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             mServiceBound = true;
         }
     };
-
-
-    public void fullScreen() {
-
-        // BEGIN_INCLUDE (get_current_ui_flags)
-        // The UI options currently enabled are represented by a bitfield.
-        // getSystemUiVisibility() gives us that bitfield.
-        int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
-        int newUiOptions = uiOptions;
-        // END_INCLUDE (get_current_ui_flags)
-        // BEGIN_INCLUDE (toggle_ui_flags)
-        boolean isImmersiveModeEnabled = isImmersiveModeEnabled();
-        if (isImmersiveModeEnabled) {
-            Log.i("TEST", "Turning immersive mode mode off. ");
-        } else {
-            Log.i("TEST", "Turning immersive mode mode on.");
-
-        }
-
-        // Navigation bar hiding:  Backwards compatible to ICS.
-        if (Build.VERSION.SDK_INT >= 14) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-        }
-
-        // Status bar hiding: Backwards compatible to Jellybean
-        if (Build.VERSION.SDK_INT >= 16) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
-        }
-
-        // Immersive mode: Backward compatible to KitKat.
-        // Note that this flag doesn't do anything by itself, it only augments the behavior
-        // of HIDE_NAVIGATION and FLAG_FULLSCREEN.  For the purposes of this sample
-        // all three flags are being toggled together.
-        // Note that there are two immersive mode UI flags, one of which is referred to as "sticky".
-        // Sticky immersive mode differs in that it makes the navigation and status bars
-        // semi-transparent, and the UI flag does not get cleared when the user interacts with
-        // the screen.
-        if (Build.VERSION.SDK_INT >= 18) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        }
-
-        getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
-        //END_INCLUDE (set_ui_flags)
-    }
-
-    private boolean isImmersiveModeEnabled() {
-        return ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
-    }
-
 
 }
