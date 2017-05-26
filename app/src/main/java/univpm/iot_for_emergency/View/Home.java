@@ -15,6 +15,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
@@ -240,17 +241,35 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 }
                 }
             }, SCAN_PERIOD);
+           //mBluetoothLeScanner.startScan(scanCallback)
 
-           mBluetoothLeScanner.startScan(scanCallback);
+
+            String Sensortag_Service = String.valueOf(SensorTagGatt.UUID_DEVINFO_SERV);
+            ParcelUuid ParcelUuid_Sensortag_Service = ParcelUuid.fromString(Sensortag_Service);
+            ScanFilter scanFilter =
+                    new ScanFilter.Builder()
+                            .setServiceUuid(ParcelUuid_Sensortag_Service)
+                            .build();
+            List<ScanFilter> scanFilters = new ArrayList<ScanFilter>();
+            scanFilters.add(scanFilter);
+
+            ScanSettings scanSettings =
+                    new ScanSettings.Builder().build();
+
+            mBluetoothLeScanner.startScan(scanFilters, scanSettings, scanCallback);
         } else {
             mBluetoothLeScanner.stopScan(scanCallback);
         }
     }
 
+
     private ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
+
+
+            Log.e("UUID", String.valueOf(result.getDevice().getUuids()));
 
                 if(callbackType==1)
                 {
