@@ -6,6 +6,8 @@ import univpm.iot_for_emergency.Controller.HomeController;
 import univpm.iot_for_emergency.Model.TabDatiBeacon;
 import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
 import univpm.iot_for_emergency.View.Funzionali.Mappa;
+import univpm.iot_for_emergency.View.Funzionali.SensorTagData;
+import univpm.iot_for_emergency.View.Funzionali.SensorTagGatt;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
 
@@ -16,7 +18,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,6 +33,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.ParcelUuid;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -50,8 +55,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static android.R.attr.uiOptions;
 
@@ -234,7 +241,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 }
             }, SCAN_PERIOD);
 
-            mBluetoothLeScanner.startScan(scanCallback);
+           mBluetoothLeScanner.startScan(scanCallback);
         } else {
             mBluetoothLeScanner.stopScan(scanCallback);
         }
@@ -244,9 +251,15 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            if(result.getDevice().getName().contains("SensorTag")) {
-                if(mBluetoothLeService.initialize()) {
+
+                if(callbackType==1)
+                {
+                    Log.e("Callback", String.valueOf(callbackType));
+                }
+                else if(result.getDevice().getName().contains("SensorTag")) {
+                    if(mBluetoothLeService.initialize()) {
                     Device=result.getDevice().getAddress();
+                    toolbar.setTitle("SensorTag "+Device);
                     mBluetoothLeService.connect(Device);
                     mConnected=true;
                     scanLeDevice(false);
