@@ -180,13 +180,16 @@ public class Registrazione extends AppCompatActivity {
 
            switch (c) {
                case 0:
-               displayToast("I campi contrassegnati con * non posso essere vuoti");
+               if (User.isEmpty())
+                   username.setError("Questo campo non può essere vuoto");
+               if (Pass.isEmpty())
+                   password.setError("Questo campo non può essere vuoto");
                break;
                case 1:
-               displayToast("Le password non corrispondono");
+               confPassword.setError("Le password non corrispondono");
                break;
                case 2:
-               displayToast("Username non disponibile");
+               username.setError("Username non disponibile");
                break;
                case 3:
                displayToast("Utente registrato ");

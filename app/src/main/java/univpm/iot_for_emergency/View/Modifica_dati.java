@@ -186,12 +186,10 @@ public class Modifica_dati extends AppCompatActivity {
             int spinnerPosition = adapterproblemi.getPosition(compareValueprob);
             spinnerproblemi.setSelection(spinnerPosition);
         }
-        spinnerproblemi.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+          spinnerproblemi.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterproblemi, View view,int pos, long id) {
 
                 Problemi = (String) adapterproblemi.getItemAtPosition(pos);
-
-
             }
             public void onNothingSelected(AdapterView<?> arg0) {
 
