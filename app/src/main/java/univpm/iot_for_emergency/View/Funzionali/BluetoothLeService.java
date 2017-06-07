@@ -1,5 +1,6 @@
 package univpm.iot_for_emergency.View.Funzionali;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -9,120 +10,169 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+
+import java.lang.reflect.Method;
 
 import static android.content.ContentValues.TAG;
 
 
 /*Service che si occupa di connettere e leggere i dati dal Beacon.*/
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 
 public class BluetoothLeService extends Service {
     private static String LOG_TAG = "BluetoothLeService";
-    private IBinder mBinder = new MyBinder();
-    private BluetoothManager mBluetoothManager;
+    private BluetoothLeScanner mBluetoothLeScanner;
     private BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
-    private BluetoothGatt mBluetoothGatt;
+    private Handler mHandler;
+    // Stops scanning after 10 seconds.
+    private static final long SCAN_PERIOD = 10000;
 
     private int mConnectionState = STATE_DISCONNECTED;
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
+    private String mBluetoothDeviceAddress;
+    private BluetoothGatt mBluetoothGatt;
+
+
 
     private static final byte[] ENABLE_SENSOR = {0x01};
 
 
 
+
     @Override
     public void onCreate() {
+        Log.i("ScanService", "sono partito");
         super.onCreate();
-        Log.v(LOG_TAG, "in onCreate");
+        getBluetoothAdapterAndLeScanner();
+        mHandler = new Handler();
+        mBluetoothDeviceAddress="";
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void getBluetoothAdapterAndLeScanner() {
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+        mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("ScanService", "OnStartCommand ");
+        scanLeDevice(true);
+        //TODO do something useful
+        return Service.START_NOT_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.v(LOG_TAG, "in onBind");
-        return mBinder;
+        //TODO for communication return IBinder implementation
+        return null;
     }
 
-    @Override
-    public void onRebind(Intent intent) {
-        Log.v(LOG_TAG, "in onRebind");
-        super.onRebind(intent);
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Log.v(LOG_TAG, "in onUnbind");
-        return true;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.v(LOG_TAG, "in onDestroy");
-    }
-
-
-    public class MyBinder extends Binder {
-        public BluetoothLeService getService() {
-            return BluetoothLeService.this;
+    private void scanLeDevice(final boolean enable) {
+        if (enable) {
+            Log.i("ScanService", "scanledevice dentro");
+            // Lo scan si ferma dopo un tempo predefinito.
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mBluetoothLeScanner.stopScan(scanCallback);
+                    final Intent intent1 = new Intent("action");
+                    intent1.putExtra("nome","pausa");
+                    sendBroadcast(intent1);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            scanLeDevice(true);
+                        }
+                    }, 5000);
+                    Log.e("ble scanner","Tempo scaduto");
+                }
+            }, SCAN_PERIOD);
+            mBluetoothLeScanner.startScan(scanCallback);
+            final Intent intent1 = new Intent("action");
+            intent1.putExtra("nome","scanning");
+            sendBroadcast(intent1);
+        } else {
+            mBluetoothLeScanner.stopScan(scanCallback);
         }
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public boolean initialize() {
 
-        if (mBluetoothManager == null) { /* Provo ad istanziare il BluettoothManager da cui prenderò il BluetoothAdapter */
-            mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-            if (mBluetoothManager == null) {
-                Log.e(TAG, "Unable to initialize BluetoothManager.");
-                return false;
+    private ScanCallback scanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            Log.i("ScanService", "callback dentro");
+            Log.e("Errore", String.valueOf(callbackType));
+            super.onScanResult(callbackType, result);
+            BluetoothDevice device = result.getDevice();
+            final String deviceName = device.getName();
+            mBluetoothDeviceAddress=device.getAddress();
+            if (deviceName != null && deviceName.length() > 0) {
+                if (deviceName.contains("SensorTag")) {
+                    Log.e("callback",deviceName);
+                    connect();
+                    scanLeDevice(false);
+                    final Intent intent = new Intent("univpm.iot_for_emergency.View.Funzionali.Trovato");
+                    intent.putExtra("address",mBluetoothDeviceAddress);
+                    sendBroadcast(intent);
+
+                }
+            } else {
+                Log.e("Errore", String.valueOf(callbackType));
             }
         }
-           /* Provo ad istanziare il BluettoothAdapeter */
-        mBluetoothAdapter = mBluetoothManager.getAdapter();
-        if (mBluetoothAdapter == null) {
-            Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
-            return false;
+    };
+
+    private boolean refreshDeviceCache(BluetoothGatt gatt){
+        try {
+            BluetoothGatt localBluetoothGatt = gatt;
+            Method localMethod = localBluetoothGatt.getClass().getMethod("refresh", new Class[0]);
+            if (localMethod != null) {
+                boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
+                return bool;
+            }
         }
-        return true;
+        catch (Exception localException) {
+            Log.e(TAG, "An exception occured while refreshing device");
+        }
+        return false;
     }
+
+
+
     /* Connessione a dispositivo*/
-    public boolean connect(final String address) {
-        if (mBluetoothAdapter == null || address == null) {
+    public boolean connect() {
+        if (mBluetoothAdapter == null || mBluetoothDeviceAddress == null) {
             Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
 
-        if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
-                && mBluetoothGatt != null) {
-            Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
-            if (mBluetoothGatt.connect()) {
-                mConnectionState = STATE_CONNECTING;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+        final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress);
         if (device == null) {
             Log.w(TAG, "Device not found.  Unable to connect.");
             return false;
         }
 
         mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
+        refreshDeviceCache(mBluetoothGatt);
         Log.d(TAG, "Trying to create a new connection.");
-        mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
         return true;
     }
@@ -206,10 +256,13 @@ public class BluetoothLeService extends Service {
         final Intent intent = new Intent(action);
         double humidity = SensorTagData.extractHumidity(characteristic);
         double temperature = SensorTagData.extractHumAmbientTemperature(characteristic);
+        intent.putExtra("device",mBluetoothDeviceAddress);
         intent.putExtra("hum",humidity);
         intent.putExtra("temp",temperature);
         sendBroadcast(intent);
-        disconnect();
+        if(!disconnect()){
+            stopSelf();
+        }
         close();
     }
 
@@ -225,12 +278,13 @@ public class BluetoothLeService extends Service {
         sendBroadcast(intent);
     }
 
-    public void disconnect() {
+    public boolean disconnect() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
+            return false;
         }
         mBluetoothGatt.disconnect();
+        return true;
     }
 
     /**

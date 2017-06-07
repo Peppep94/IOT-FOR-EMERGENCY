@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
@@ -14,6 +16,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import univpm.iot_for_emergency.R;
 
@@ -30,55 +37,61 @@ public class Mappa  extends ImageView{
 
 
     public void init(Toolbar toolbar){
-        Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.drawable.q145_color);
+        Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.drawable.q155_misure);
         Bitmap mutableBitmap = bMap.copy(Bitmap.Config.ARGB_8888, true);
         Bitmap bMap1 = BitmapFactory.decodeResource(getResources(),R.drawable.sensortag);
         Bitmap mutableBitmap1 = bMap1.copy(Bitmap.Config.ARGB_8888, true);
-        mutableBitmap=overlay(mutableBitmap,mutableBitmap1);
         mutableBitmap=overlay(mutableBitmap,mutableBitmap1);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT);
         params.addRule(RelativeLayout.BELOW, toolbar.getId());
         int dpValue = 43; // margin in dips
         float d = this.getResources().getDisplayMetrics().density;
         int margin = (int)(dpValue * d); // margin in pixels
-        Log.e("dp ", String.valueOf(margin));
         params.setMargins(0,margin,0,0);
         this.setLayoutParams(params);
         this.setImageBitmap(mutableBitmap);
-        this.setOnTouchListener(new OnTouchListener() {
 
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                float eventX = event.getX();
-                float eventY = event.getY();
-
-                switch (event.getAction())
-                {
-                    case MotionEvent.ACTION_DOWN:
-                        String posizione="("+Math.round(eventX)+","+Math.round(eventY)+")";
-                        Log.e("dp ", "Posizione "+posizione);
-
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        return true;
-                }
-                return false;            }
-        });
     }
 
     private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
         Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
-        int maxw=bmp1.getWidth();
-        int maxh=bmp1.getHeight();
-        int dens=bmp1.getDensity();
-        Log.e("ciaone",maxh+ " "+maxw+" "+dens);
-        Rect rect=new Rect();
-        rect.set(130,250,170,290);
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(bmp1, new Matrix(), null);
-        canvas.drawBitmap(bmp2,null,rect,null);
+        Paint paint=new Paint();
+        paint.setColor(Color.BLACK);
+
+        InputStream inputStream;
+
+        String[] ids;
+
+        inputStream = getResources().openRawResource(R.raw.punti155csv);
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        try {
+            String csvLine;
+            while ((csvLine = reader.readLine()) != null) {
+
+
+
+                ids=csvLine.split(";");
+                try{
+
+                    canvas.drawCircle((float) ((Float.parseFloat(ids[1])-419.125)*8), (float) ((Float.parseFloat(ids[0])-42.375)*7.8889),10,paint);
+
+                }catch (Exception e){
+                    Log.e("Unknown ",e.toString());
+                }
+            }
+
+
+
+
+        }
+        catch (IOException ex) {
+            throw new RuntimeException("Error in reading CSV file: "+ex);
+        }
+
+
         return bmOverlay;
     }
 

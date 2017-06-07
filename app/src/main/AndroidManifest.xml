@@ -48,8 +48,10 @@
 
         <service
             android:name=".View.Funzionali.BluetoothLeService"
-            android:enabled="true"
-            android:exported="false"></service>
+            android:icon="@mipmap/ic_launcher"
+            android:label="MyService"/>
+
+
     </application>
 
 </manifest>
