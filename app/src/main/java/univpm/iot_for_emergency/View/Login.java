@@ -30,7 +30,6 @@ import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
 import univpm.iot_for_emergency.Controller.RegistraController;
-import univpm.iot_for_emergency.Controller.SalvaPuntiController;
 import univpm.iot_for_emergency.Model.TabPunti;
 import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
@@ -165,7 +164,7 @@ public class Login extends AppCompatActivity {
 
         int z1 = 0;
         String a1[] = xxx.split(",");
-        SalvaPuntiController salvapunti=new SalvaPuntiController();
+        LoginController salvapunti=new LoginController();
         while (z1 < a1.length) {
             codice1=a1[z1];
             codice1.trim();
