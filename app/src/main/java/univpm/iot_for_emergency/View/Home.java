@@ -241,6 +241,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void loguot(){
+        Intent i= new Intent(this, BluetoothLeService.class);
+        this.stopService(i);
         sessione.UtenteLoggato(false,null);
         finish();
         startActivity(new Intent(univpm.iot_for_emergency.View.Home.this,Login.class));
