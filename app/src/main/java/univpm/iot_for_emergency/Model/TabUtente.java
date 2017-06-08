@@ -41,7 +41,7 @@ public class TabUtente extends SugarRecord {
 
     }
 
-    public int Registra(String User,String Nome,String Cognome,String Pass,String DataN,String Problemi,String Sesso,String Confpass){
+    public int Registra(String Nome,String Cognome,String Pass,String DataN,String User,String Problemi,String Sesso,String Confpass){
 
         List<TabUtente> tabUtente=TabUtente.find(TabUtente.class,"user=?",User);
 
@@ -52,7 +52,7 @@ public class TabUtente extends SugarRecord {
         }else if (tabUtente.size()>0){
             return 2;
         }else{
-            TabUtente Utente=new TabUtente(Nome,Cognome,Pass,DataN, User,Problemi,Sesso);
+            TabUtente Utente=new TabUtente(Nome,Cognome,Pass,DataN,User,Problemi,Sesso);
             Utente.save();
             return 3;
         }
