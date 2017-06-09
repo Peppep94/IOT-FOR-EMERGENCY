@@ -68,9 +68,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
         user=sessione.user();
 
-
-
-
         // Controllo se il BLE è supportato
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this,

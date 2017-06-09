@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
@@ -53,6 +54,12 @@ public class Login extends AppCompatActivity {
     private LoginController loginController;
     private final static String TAG = Login.class.getSimpleName();
 
+    private Button bLogin;
+    private TextView registerLink;
+    private EditText Usertext;
+    private EditText Passtext;
+    int contatore;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,23 +68,25 @@ public class Login extends AppCompatActivity {
 
         sessione =new Sessione(this);
         loginController=new LoginController();
-        final Button bLogin=(Button) findViewById(R.id.button);
+        bLogin=(Button) findViewById(R.id.button);
         final Button bLoginGuest=(Button) findViewById(R.id.bLoginGuest);
-        final TextView registerLink = (TextView) findViewById(R.id.RegisterHere);
+        registerLink = (TextView) findViewById(R.id.RegisterHere);
+        contatore=0;
+        Usertext = (EditText) findViewById(R.id.User);
+        Passtext = (EditText) findViewById(R.id.Password);
 
-        final EditText User = (EditText) findViewById(R.id.User);
-        final EditText Pass = (EditText) findViewById(R.id.Password);
 
         //Leggo il file Server.xls dove ci sono la porta e l'ip
         controlloServer();
 
         if(ip.equals("") || porta.equals("")){
-            displayToast("Errore di accesso al Server!");
-            //bLogin.setVisibility(View.INVISIBLE);
+           // displayToast("Errore di accesso al Server!");
             bLogin.setEnabled(false);
-            User.setEnabled(false);
-            Pass.setEnabled(false);
+            Usertext.setEnabled(false);
+            Passtext.setEnabled(false);
             registerLink.setEnabled(false);
+            Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+            contatore=contatore+1;
         }else{
             //Leggo il file Dati.xls dove ci sono le coordinate dei punti dove sono posizionati i beacon sulle varie mappe
             LetturaMappa();
@@ -267,29 +276,26 @@ public class Login extends AppCompatActivity {
 
     private void Login(){
 
-        final EditText username=(EditText) findViewById(R.id.User);  // dichiaro gli oggetti di vari tipi  e li associo agli elementi dell'interfaccia grafica
-        final EditText password=(EditText) findViewById(R.id.Password);
-        final Button login=(Button) findViewById(R.id.button);
 
-        User= username.getText().toString();
-        Pass=password.getText().toString();
+        User= Usertext.getText().toString();
+        Pass=Passtext.getText().toString();
         Log.i(TAG, "username "+User);
 
 
         if (User.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(User).matches()) {
-            username.setError("Inserisci una mail valida");
+            Usertext.setError("Inserisci una mail valida");
         } else {
-            username.setError(null);
+            Usertext.setError(null);
         }
 
-        if (Pass.isEmpty() || password.length() < 4 || password.length() > 10) {
-            password.setError("tra 4 e 10 caratteri");
+        if (Pass.isEmpty() || Pass.length() < 4 || Pass.length() > 10) {
+            Passtext.setError("tra 4 e 10 caratteri");
         } else {
-            password.setError(null);
+            Passtext.setError(null);
         }
 
         if(loginController.controlUserPasscontroller(User,Pass)){  //controllo se esiste un utente registrato corrispondente
-            login.setEnabled(false);
+            bLogin.setEnabled(false);
             final ProgressDialog progressDialog = new ProgressDialog(Login.this,
                     R.style.AppTheme_Dark_Dialog);
             progressDialog.setIndeterminate(true);
@@ -376,8 +382,8 @@ public class Login extends AppCompatActivity {
             in.close();
         }
         catch (IOException e1) {
-            displayToast("Errore connessione Server");
-            Log.d("Servizio web", e1.getLocalizedMessage());
+            //displayToast("Errore connessione Server");
+            //Log.d("Servizio web", e1.getLocalizedMessage());
         }
         return bit;
     }
@@ -436,7 +442,21 @@ public class Login extends AppCompatActivity {
 
         protected void onPostExecute(String s) {
 
-            Log.e("Punto:",result);
+            final String controllo=result;
+            if (controllo==null)
+            {
+
+                if(contatore<1){
+                    bLogin.setEnabled(false);
+                    Usertext.setEnabled(false);
+                    Passtext.setEnabled(false);
+                    registerLink.setEnabled(false);
+                    Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+                    contatore=contatore+1;
+                }
+            }
+
+           // Log.e("Punto:",result);
             //displayToast(result);
         }
     }

@@ -5,11 +5,11 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <uses-feature android:name="android.hardware.location.gps" />
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:name="com.orm.SugarApp"
@@ -31,30 +31,48 @@
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="univpm.iot_for_emergency" />
 
-        <activity android:name=".View.Login" android:theme="@style/AppTheme.Dark">
+        <activity
+            android:name=".View.Login"
+            android:theme="@style/AppTheme.Dark">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"
-                    android:theme="@style/AppTheme.Dark"
-                    />
+                <category
+                    android:name="android.intent.category.LAUNCHER"
+                    android:theme="@style/AppTheme.Dark" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.Registrazione" android:theme="@style/AppTheme.Dark"/>
-        <activity android:name=".View.Modifica_dati" android:theme="@style/AppTheme.Dark" />
+        <activity
+            android:name=".View.Registrazione"
+            android:theme="@style/AppTheme.Dark" />
+        <activity
+            android:name=".View.Modifica_dati"
+            android:theme="@style/AppTheme.Dark" />
         <activity
             android:name=".View.Home"
+            android:configChanges="orientation|keyboardHidden"
             android:label=""
-            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
-            android:configChanges="orientation|keyboardHidden"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".View.Funzionali.BluetoothLeService"
             android:icon="@mipmap/ic_launcher"
-            android:label="MyService"/>
+            android:label="MyService" />
 
+        <receiver
+            android:name=".View.Funzionali.Receiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="univpm.iot_for_emergency.View.Funzionali.Ricevuti" />
+            </intent-filter>
+        </receiver>
 
+        <service
+            android:name=".View.Funzionali.InvioDatiService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>
