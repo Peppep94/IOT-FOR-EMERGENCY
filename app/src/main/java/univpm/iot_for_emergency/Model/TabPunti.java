@@ -2,6 +2,8 @@ package univpm.iot_for_emergency.Model;
 
 import com.orm.SugarRecord;
 
+import java.util.List;
+
 /**
  * Created by MacBookPro on 06/06/17.
  */
@@ -40,8 +42,16 @@ public class TabPunti extends SugarRecord{
             return 2;
         }
 
+    }
 
-
+    public TabPunti TrovaCoordQuotaModel(String address)
+    {
+        List<TabPunti> tabPunti = TabPunti.find(TabPunti.class,"address=?",address);
+        /*int[] coord={0,0};
+        coord[0]= Integer.parseInt(tabPunti.get(0).x);
+        coord[1]= Integer.parseInt(tabPunti.get(0).y);
+        coord[2]= Integer.parseInt(tabPunti.get(0).quota);*/
+        return tabPunti.get(0);
     }
 
 

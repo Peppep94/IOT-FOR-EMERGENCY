@@ -130,7 +130,7 @@ public class BluetoothLeService extends Service {
                     connect();
                     scanLeDevice(false);
                     final Intent intent = new Intent("univpm.iot_for_emergency.View.Funzionali.Trovato");
-                    intent.putExtra("address",mBluetoothDeviceAddress);
+                    intent.putExtra("device",mBluetoothDeviceAddress);
                     sendBroadcast(intent);
 
                 }

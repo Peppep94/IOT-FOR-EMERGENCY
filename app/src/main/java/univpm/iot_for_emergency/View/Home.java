@@ -3,6 +3,7 @@ package univpm.iot_for_emergency.View;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 import univpm.iot_for_emergency.Controller.HomeController;
+import univpm.iot_for_emergency.Model.TabPunti;
 import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
 import univpm.iot_for_emergency.View.Funzionali.Mappa;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
@@ -249,6 +250,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         @Override
         public void onReceive(final Context context, Intent intent) {
             final String action = intent.getAction();
+            HomeController homeController=new HomeController();
 
 
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
@@ -259,7 +261,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                 toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
 
-                HomeController homeController=new HomeController();
+
                 homeController.updatesaveBeacon(device,currentDateTimeString,String.valueOf(temperature),String.valueOf(humidity));
 
             }
@@ -271,7 +273,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
 
             if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(action)) {
-                imageView.init(toolbar);
+                String device=intent.getStringExtra("device");
+                TabPunti coord=homeController.TrovaCoordQuota(device);
+                imageView.init(toolbar,Integer.parseInt(coord.x),Integer.parseInt(coord.y),Integer.parseInt(coord.quota));
                 PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
                 photoViewAttacher.update();
                 photoViewAttacher.setOnLongClickListener(new View.OnLongClickListener() {

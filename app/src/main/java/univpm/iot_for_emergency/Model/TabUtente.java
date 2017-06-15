@@ -1,5 +1,7 @@
 package univpm.iot_for_emergency.Model;
 
+import android.util.Log;
+
 import com.orm.SugarRecord;
 
 import java.util.List;
@@ -41,9 +43,10 @@ public class TabUtente extends SugarRecord {
 
     }
 
-    public int Registra(String Nome,String Cognome,String Pass,String DataN,String User,String Problemi,String Sesso,String Confpass){
+    public int Registra(String User,String Nome,String Cognome,String Pass,String DataN,String Problemi,String Sesso,String Confpass){
 
         List<TabUtente> tabUtente=TabUtente.find(TabUtente.class,"user=?",User);
+
 
         if(User.isEmpty() || Pass.isEmpty()){
             return 0;
