@@ -13,17 +13,27 @@ import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.View;
 
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.util.Date;
+
+import uk.co.senab.photoview.PhotoViewAttacher;
+import univpm.iot_for_emergency.Controller.HomeController;
+import univpm.iot_for_emergency.Model.TabPunti;
 
 import static android.content.ContentValues.TAG;
 
@@ -46,6 +56,7 @@ public class BluetoothLeService extends Service {
     private static final int STATE_CONNECTED = 2;
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
+    private boolean logout;
 
 
 
@@ -61,6 +72,8 @@ public class BluetoothLeService extends Service {
         getBluetoothAdapterAndLeScanner();
         mHandler = new Handler();
         mBluetoothDeviceAddress="";
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        logout=false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -72,15 +85,13 @@ public class BluetoothLeService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i("ScanService", "OnStartCommand ");
+        logout=false;
         scanLeDevice(true);
-        //TODO do something useful
         return Service.START_NOT_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        //TODO for communication return IBinder implementation
         return null;
     }
 
@@ -95,12 +106,14 @@ public class BluetoothLeService extends Service {
                     final Intent intent1 = new Intent("action");
                     intent1.putExtra("nome","pausa");
                     sendBroadcast(intent1);
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            scanLeDevice(true);
-                        }
-                    }, 5000);
+                    if (!logout) {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                scanLeDevice(true);
+                            }
+                        }, 5000);
+                    }
                     Log.e("ble scanner","Tempo scaduto");
                 }
             }, SCAN_PERIOD);
@@ -297,6 +310,25 @@ public class BluetoothLeService extends Service {
         }
         mBluetoothGatt.close();
         mBluetoothGatt = null;
+    }
+
+
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            if (action.equals("univpm.iot_for_emergency.View.Funzionali.Stop")) {logout=true;}
+
+        }
+    };
+
+
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Stop");
+        return intentFilter;
     }
 
 

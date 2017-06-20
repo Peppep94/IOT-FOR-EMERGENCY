@@ -64,6 +64,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         setSupportActionBar(toolbar);
         sessione = new Sessione(this);
         imageView = (Mappa) findViewById(R.id.mappa);
+
         if (!sessione.loggedin()) {
             loguot();
         }
@@ -223,7 +224,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         if (id == R.id.modificadati) {
             if(user.contains("Guest"))
             {
-                Toast.makeText(getApplicationContext(),"Non sei abilitato alla modifica",Toast.LENGTH_SHORT).show(); //in caso di utente guest non permetto la modifica
+                Toast.makeText(getApplicationContext(),"Non sei abilitato alla modifica",Toast.LENGTH_LONG).show(); //in caso di utente guest non permetto la modifica
             }
             else {
                 Intent intent = new Intent(univpm.iot_for_emergency.View.Home.this, Modifica_dati.class); //reinderizzo a Modificadati
@@ -239,8 +240,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void loguot(){
-        Intent i= new Intent(this, BluetoothLeService.class);
-        this.stopService(i);
+        Intent i= new Intent("univpm.iot_for_emergency.View.Funzionali.Stop");
+        sendBroadcast(i);
         sessione.UtenteLoggato(false,null);
         finish();
         startActivity(new Intent(univpm.iot_for_emergency.View.Home.this,Login.class));
