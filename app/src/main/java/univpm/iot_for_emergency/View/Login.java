@@ -1,11 +1,17 @@
 package univpm.iot_for_emergency.View;
 
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
@@ -23,16 +29,21 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
+import uk.co.senab.photoview.PhotoViewAttacher;
+import univpm.iot_for_emergency.Controller.HomeController;
 import univpm.iot_for_emergency.Controller.RegistraController;
 import univpm.iot_for_emergency.Model.TabPunti;
 import univpm.iot_for_emergency.Model.TabUtente;
+import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.R;
@@ -59,10 +70,17 @@ public class Login extends AppCompatActivity {
     private EditText Usertext;
     private EditText Passtext;
     int contatore;
+    ProgressDialog progressDialogDB;
+    Handler mHandler;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        progressDialogDB= new ProgressDialog(Login.this, R.style.AppTheme_Dark_Dialog);
+        progressDialogDB.setIndeterminate(true);
+        progressDialogDB.setMessage("Connessione Server...");
+        progressDialogDB.setCancelable(false);
+        progressDialogDB.show();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -75,12 +93,29 @@ public class Login extends AppCompatActivity {
         Usertext = (EditText) findViewById(R.id.User);
         Passtext = (EditText) findViewById(R.id.Password);
 
+        mHandler=new Handler();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (contatore==0) {
+                    progressDialogDB.dismiss();
+                    bLogin.setEnabled(false);
+                    Usertext.setEnabled(false);
+                    Passtext.setEnabled(false);
+                    registerLink.setEnabled(false);
+                    Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+                    contatore = contatore + 1;
+                }
+            }
+        }, 5000);
+
 
         //Leggo il file Server.xls dove ci sono la porta e l'ip
         controlloServer();
 
         if(ip.equals("") || porta.equals("")){
            // displayToast("Errore di accesso al Server!");
+            progressDialogDB.dismiss();
             bLogin.setEnabled(false);
             Usertext.setEnabled(false);
             Passtext.setEnabled(false);
@@ -123,10 +158,23 @@ public class Login extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+    }
+
     //controlla se è già stata avviata la sessione
     private void controlloPrimoAvvio(){
 
         if (sessione.loggedin()){
+            contatore=contatore+1;
             startActivity(new Intent(Login.this,Home.class));
             finish();
         }
@@ -359,12 +407,12 @@ public class Login extends AppCompatActivity {
             System.out.println("Output:"+value);
             result= value;
             risposta = httpConn.getResponseCode();
-
             if (risposta == HttpURLConnection.HTTP_OK) {
                 in = httpConn.getInputStream();
             }
         }
         catch (Exception ex) {
+            sendBroadcast(new Intent("univpm.iot_for_emergency.View.Offline"));
             Log.d("Connessione", ex.getLocalizedMessage());
             throw new IOException("Errore connessione");
         }
@@ -377,7 +425,6 @@ public class Login extends AppCompatActivity {
         InputStream in = null;
         try {
             in = ApriConnessioneHttp(URL);
-
             bit = "Operazione eseguita";
             in.close();
         }
@@ -445,7 +492,19 @@ public class Login extends AppCompatActivity {
             final String controllo=result;
             if (controllo==null)
             {
+            }
 
+           // Log.e("Punto:",result);
+            //displayToast(result);
+        }
+    }
+
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (("univpm.iot_for_emergency.View.Offline").equals(action)) {
+                progressDialogDB.dismiss();
                 if(contatore<1){
                     bLogin.setEnabled(false);
                     Usertext.setEnabled(false);
@@ -455,10 +514,15 @@ public class Login extends AppCompatActivity {
                     contatore=contatore+1;
                 }
             }
-
-           // Log.e("Punto:",result);
-            //displayToast(result);
         }
+    };
+
+
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("univpm.iot_for_emergency.View.Offline");
+        return intentFilter;
     }
 
 

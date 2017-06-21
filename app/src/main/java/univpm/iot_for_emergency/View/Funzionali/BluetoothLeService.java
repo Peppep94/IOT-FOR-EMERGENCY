@@ -206,6 +206,7 @@ public class BluetoothLeService extends Service {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 mConnectionState = STATE_DISCONNECTED;
                 Log.i(TAG, "Disconnected from GATT server.");
+                unregisterReceiver(mGattUpdateReceiver);
             }
             gatt.discoverServices();
         }
@@ -273,10 +274,9 @@ public class BluetoothLeService extends Service {
         intent.putExtra("hum",humidity);
         intent.putExtra("temp",temperature);
         sendBroadcast(intent);
-        if(!disconnect()){
-            stopSelf();
-        }
+        disconnect();
         close();
+
     }
 
     private void broadcasUpdate(final String action,String device){
@@ -294,6 +294,8 @@ public class BluetoothLeService extends Service {
     public boolean disconnect() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
+            getBluetoothAdapterAndLeScanner();
+            disconnect();
             return false;
         }
         mBluetoothGatt.disconnect();
