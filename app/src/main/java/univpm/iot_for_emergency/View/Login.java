@@ -474,8 +474,10 @@ public class Login extends AppCompatActivity {
 
                 }
                 if (i==pippo.length) {
-                    progressDialogDB.dismiss();
-                    contatore=contatore+1;
+                    if(contatore==0) {
+                        progressDialogDB.dismiss();
+                        contatore = contatore + 1;
+                    }
                 }
             } else{
                 displayToast("Database Server vuoto");

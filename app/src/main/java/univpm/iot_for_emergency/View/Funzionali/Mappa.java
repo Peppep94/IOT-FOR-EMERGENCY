@@ -58,8 +58,6 @@ public class Mappa  extends ImageView{
         Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(bmp1, new Matrix(), null);
-        Paint paint=new Paint();
-        paint.setColor(Color.BLACK);
         Rect rect=null;
         if(quota==145)
             rect= new Rect((int) ((y-419.125)*8-50),(int) ((x-42.375)*7.8889+50),(int) ((y-419.125)*8-10),(int) ((x-42.375)*7.8889+90));
@@ -70,7 +68,6 @@ public class Mappa  extends ImageView{
         //canvas.drawCircle((float) ((Float.parseFloat(ids[1])-419.125)*8), (float) ((Float.parseFloat(ids[0])-42.375)*7.8889),10,paint);
         canvas.drawBitmap(bmp2,null,rect,null);
         //canvas.drawCircle((float) ((y-419.125)*8-30), (float) ((x-42.375)*7.8889+70),10,paint);
-
         return bmOverlay;
     }
 

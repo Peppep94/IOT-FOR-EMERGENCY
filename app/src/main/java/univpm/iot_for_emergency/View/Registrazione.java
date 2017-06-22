@@ -2,6 +2,7 @@ package univpm.iot_for_emergency.View;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -55,7 +56,6 @@ public class Registrazione extends AppCompatActivity {
     protected int mMonth;
     protected int mDay;
 
-    JSONObject jsonObject = new JSONObject();
 
     protected DatePickerDialog.OnDateSetListener mDateSetListener =
             new DatePickerDialog.OnDateSetListener() {
@@ -181,92 +181,33 @@ public class Registrazione extends AppCompatActivity {
         final EditText password=(EditText) findViewById(R.id.Password);
         final EditText confPassword=(EditText) findViewById(R.id.ConfermaPassword);
 
-
         Nome = name.getText().toString();
         Cognome = cognome.getText().toString();
         User = username.getText().toString();
         Pass = password.getText().toString();
         ConfPass = confPassword.getText().toString();
-
         DataN =  String.valueOf(new StringBuilder()
                 .append("  ")
                 .append(mDay).append("/")
                 .append(mMonth+1).append("/")
                 .append(mYear).append(" "));
-
-
         DataN=DataN.replace("/","-");
 
-        try {
-            jsonObject.put("nome", Nome);
-            jsonObject.put("cognome", Cognome);
-            jsonObject.put("pass", Pass);
-            jsonObject.put("user", User);
-            jsonObject.put("sesso", Sesso);
-            jsonObject.put("problemi", Problemi);
-            jsonObject.put("datan", DataN);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        if (!ConfPass.equals(Pass)){
-            displayToast("Le password non corrispondono!");
-
-        }else if(User.isEmpty() || Pass.isEmpty()){
-            displayToast("User e password non possono essere vuoti!");
-        }else{
-            new Registrazione.send().execute("http://"+ip+":"+porta+"/MyFirsRestService/utenti");
-        }
+        Intent intent=new Intent();
+        intent.setAction("univpm.iot_for_emergency.View.Registrazione");
+        intent.putExtra("nome", Nome);
+        intent.putExtra("cognome", Cognome);
+        intent.putExtra("pass", Pass);
+        intent.putExtra("user", User);
+        intent.putExtra("sesso", Sesso);
+        intent.putExtra("problemi", Problemi);
+        intent.putExtra("datan", DataN);
+        intent.putExtra("confpass", ConfPass);
+        intent.putExtra("ip",ip);
+        intent.putExtra("porta",porta);
+        sendBroadcast(intent);
 
     }
-
-    /*
-    private void Registra(){
-
-        final EditText name=(EditText) findViewById(R.id.Name);
-        final EditText cognome=(EditText) findViewById(R.id.Cognome);
-        final EditText username=(EditText) findViewById(R.id.User);
-        final EditText password=(EditText) findViewById(R.id.Password);
-        final EditText confPassword=(EditText) findViewById(R.id.ConfermaPassword);
-
-
-        Nome = name.getText().toString();
-        Cognome = cognome.getText().toString();
-        User = username.getText().toString();
-        Pass = password.getText().toString();
-        String Confpass = confPassword.getText().toString();
-
-        DataN =  String.valueOf(new StringBuilder()
-                .append("  ")
-                .append(mDay).append("/")
-                .append(mMonth+1).append("/")
-                .append(mYear).append(" "));
-        RegistraController registraController=new RegistraController();
-
-        int c=registraController.Registracontroller(User,Nome,Cognome,Pass,DataN,Problemi,Sesso,Confpass);
-
-           switch (c) {
-               case 0:
-               if (User.isEmpty())
-                   username.setError("Questo campo non può essere vuoto");
-               if (Pass.isEmpty())
-                   password.setError("Questo campo non può essere vuoto");
-               break;
-               case 1:
-               confPassword.setError("Le password non corrispondono");
-               break;
-               case 2:
-               username.setError("Username non disponibile");
-               break;
-               case 3:
-               displayToast("Utente registrato ");
-               finish();
-               break;
-           }
-
-    }
-    */
 
     //mostra a video dei messaggi
     public void displayToast(String message){
@@ -274,102 +215,5 @@ public class Registrazione extends AppCompatActivity {
     }
 
 
-    private InputStream ApriConnessioneHttp(String urlString) throws IOException
-    {
-        InputStream in = null;
-        int risposta = -1;
 
-        URL url = new URL(urlString);
-
-
-        try{
-
-            HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-            httpURLConnection.setDoOutput(true);
-            httpURLConnection.setRequestMethod("POST"); // here you are telling that it is a POST request, which can be changed into "PUT", "GET", "DELETE" etc.
-            httpURLConnection.setRequestProperty("Content-Type", "application/json"); // here you are setting the `Content-Type` for the data you are sending which is `application/json`
-            httpURLConnection.connect();
-
-
-            DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
-            wr.writeBytes(jsonObject.toString());
-            wr.flush();
-            wr.close();
-
-            BufferedReader bf = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            String value = bf.readLine();
-            System.out.println("Output:"+value);
-            result= value;
-            risposta = httpURLConnection.getResponseCode();
-
-            if (risposta == HttpURLConnection.HTTP_OK) {
-                in = httpURLConnection.getInputStream();
-            }
-        }
-        catch (Exception ex) {
-            Log.d("Connessione", ex.getLocalizedMessage());
-            throw new IOException("Errore connessione");
-        }
-        return in;
-    }
-
-    private String avvia(String URL)
-    {
-        String bit = null;
-        InputStream in = null;
-        try {
-            in = ApriConnessioneHttp(URL);
-
-            bit = "Operazione eseguita";
-            in.close();
-        }
-        catch (IOException e1) {
-            Log.d("Servizio web", e1.getLocalizedMessage());
-        }
-        return bit;
-    }
-
-    private class send extends AsyncTask<String, Void, String> {
-
-        protected String doInBackground(String... urls) {
-            return avvia(urls[0]);
-
-        }
-
-        protected void onPostExecute(String s) {
-
-            displayToast(result);
-
-            if (result.equals("Utente Registrato Server")){
-
-                RegistraController registraController=new RegistraController();
-                int c=registraController.Registracontroller(User,Nome,Cognome,Pass,DataN,Problemi,Sesso,ConfPass);
-
-                switch (c) {
-                    case 0:
-                        displayToast("I campi contrassegnati con * non posso essere vuoti");
-                        break;
-                    case 1:
-                        displayToast("Le password non corrispondono");
-                        break;
-                    case 2:
-                        displayToast("Username non disponibile");
-                        break;
-                    case 3:
-                        displayToast("Utente registrato Locale ");
-
-                        finish();
-                        break;
-                }
-
-
-            }else{
-
-                displayToast("Utente non registrato in locale!");
-
-            }
-
-
-        }
-    }
 }

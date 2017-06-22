@@ -5,6 +5,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 import univpm.iot_for_emergency.Controller.HomeController;
 import univpm.iot_for_emergency.Model.TabPunti;
 import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
+import univpm.iot_for_emergency.View.Funzionali.InvioDatiService;
 import univpm.iot_for_emergency.View.Funzionali.Mappa;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
@@ -261,9 +262,17 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
                 String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                 toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
-
-
                 homeController.updatesaveBeacon(device,currentDateTimeString,String.valueOf(temperature),String.valueOf(humidity));
+                displayToast("ricevuti");
+                /*String humsend= String.valueOf(humidity);
+                String tempsend= String.valueOf(temperature);
+                Intent inviointent=new Intent("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio");
+                inviointent.putExtra("hum",humsend);
+                inviointent.putExtra("temp",tempsend);
+                inviointent.putExtra("data",currentDateTimeString);
+                inviointent.putExtra("device",device);
+                sendBroadcast(inviointent);*/
+
 
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Connesso").equals(action)) {
@@ -347,6 +356,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private boolean isImmersiveModeEnabled() {
         return ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
     }
+
+    public void displayToast(String message){
+        Toast.makeText(Home.this, message, Toast.LENGTH_SHORT).show();
+    }
+
 
 
 }
