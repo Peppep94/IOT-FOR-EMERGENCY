@@ -17,7 +17,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,6 +54,8 @@ public class Registrazione extends AppCompatActivity {
     protected int mYear;
     protected int mMonth;
     protected int mDay;
+
+    JSONObject jsonObject = new JSONObject();
 
     protected DatePickerDialog.OnDateSetListener mDateSetListener =
             new DatePickerDialog.OnDateSetListener() {
@@ -191,14 +197,27 @@ public class Registrazione extends AppCompatActivity {
 
         DataN=DataN.replace("/","-");
 
-        new Registrazione.send().execute("http://"+ip+":"+porta+"/MyFirsRestService/utenti?" +
-                "nome="+Nome+"" +
-                "&cognome="+Cognome+""+
-                "&pass="+Pass+""+
-                "&datan="+DataN+""+
-                "&user="+User+""+
-                "&problemi="+Problemi+""+
-                "&sesso="+Sesso+"");
+        try {
+            jsonObject.put("nome", Nome);
+            jsonObject.put("cognome", Cognome);
+            jsonObject.put("pass", Pass);
+            jsonObject.put("user", User);
+            jsonObject.put("sesso", Sesso);
+            jsonObject.put("problemi", Problemi);
+            jsonObject.put("datan", DataN);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (!ConfPass.equals(Pass)){
+            displayToast("Le password non corrispondono!");
+
+        }else if(User.isEmpty() || Pass.isEmpty()){
+            displayToast("User e password non possono essere vuoti!");
+        }else{
+            new Registrazione.send().execute("http://"+ip+":"+porta+"/MyFirsRestService/utenti");
+        }
 
     }
 
@@ -261,25 +280,30 @@ public class Registrazione extends AppCompatActivity {
         int risposta = -1;
 
         URL url = new URL(urlString);
-        URLConnection conn = url.openConnection();
 
-        if (!(conn instanceof HttpURLConnection))
-            throw new IOException("No connessione HTTP");
 
         try{
-            HttpURLConnection httpConn = (HttpURLConnection) conn;
-            httpConn.setAllowUserInteraction(false);
-            httpConn.setInstanceFollowRedirects(true);
-            httpConn.setRequestMethod("GET");
-            httpConn.connect();
-            BufferedReader bf = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+
+            HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setRequestMethod("POST"); // here you are telling that it is a POST request, which can be changed into "PUT", "GET", "DELETE" etc.
+            httpURLConnection.setRequestProperty("Content-Type", "application/json"); // here you are setting the `Content-Type` for the data you are sending which is `application/json`
+            httpURLConnection.connect();
+
+
+            DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+            wr.writeBytes(jsonObject.toString());
+            wr.flush();
+            wr.close();
+
+            BufferedReader bf = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String value = bf.readLine();
             System.out.println("Output:"+value);
             result= value;
-            risposta = httpConn.getResponseCode();
+            risposta = httpURLConnection.getResponseCode();
 
             if (risposta == HttpURLConnection.HTTP_OK) {
-                in = httpConn.getInputStream();
+                in = httpURLConnection.getInputStream();
             }
         }
         catch (Exception ex) {
@@ -319,7 +343,7 @@ public class Registrazione extends AppCompatActivity {
             if (result.equals("Utente Registrato Server")){
 
                 RegistraController registraController=new RegistraController();
-                int c=registraController.Registracontroller(Nome,Cognome,Pass,DataN,User,Problemi,Sesso,ConfPass);
+                int c=registraController.Registracontroller(User,Nome,Cognome,Pass,DataN,Problemi,Sesso,ConfPass);
 
                 switch (c) {
                     case 0:

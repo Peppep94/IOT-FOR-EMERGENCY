@@ -78,7 +78,7 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         progressDialogDB= new ProgressDialog(Login.this, R.style.AppTheme_Dark_Dialog);
         progressDialogDB.setIndeterminate(true);
-        progressDialogDB.setMessage("Connessione Server...");
+        progressDialogDB.setMessage("Connessione al Server...");
         progressDialogDB.setCancelable(false);
         progressDialogDB.show();
         super.onCreate(savedInstanceState);
@@ -293,15 +293,17 @@ public class Login extends AppCompatActivity {
 
 
         String xx = "";
-        for (int i = 1; i < 2; i++) {
-            for (int c = 0; c < 2; c++) {
-                Cell z = s.getCell(c, i);
-                xx = xx + z.getContents() + ",";
-
-            }
-
-        }
-        //System.out.println(xx);
+        Cell cell=null;
+                if(s.getRows()<2)
+                {xx=", ,";}
+                else {
+                    cell = s.getCell(0, 1);
+                    xx = xx + cell.getContents() + ",";
+                    Log.e("ip", xx);
+                    cell = s.getCell(1, 1);
+                    xx = xx + cell.getContents() + ",";
+                    Log.e("ip e porta", xx);
+                }
 
         int z = 0;
         String a[] = xx.split(",");
@@ -453,7 +455,7 @@ public class Login extends AppCompatActivity {
                 RegistraController registraController=new RegistraController();
                 while (i < (pippo.length)) {
 
-                    int c=registraController.Registracontroller(pippo[i], pippo[i + 1], pippo[i + 2], pippo[i + 3], pippo[i + 4], pippo[i + 5], pippo[i + 6], pippo[i + 2]);
+                    int c=registraController.Registracontroller(pippo[i + 4],pippo[i], pippo[i + 1], pippo[i + 2], pippo[i + 3],  pippo[i + 5], pippo[i + 6], pippo[i + 2]);
 
                     switch (c) {
                         case 0:
@@ -471,7 +473,10 @@ public class Login extends AppCompatActivity {
                     }
 
                 }
-
+                if (i==pippo.length) {
+                    progressDialogDB.dismiss();
+                    contatore=contatore+1;
+                }
             } else{
                 displayToast("Database Server vuoto");
                 Log.e("prova2","Db Server Vuoto");
