@@ -11,6 +11,8 @@ import org.json.JSONException;
 import java.text.DateFormat;
 import java.util.Date;
 
+import univpm.iot_for_emergency.Controller.HomeController;
+
 public class Receiver extends BroadcastReceiver {
     private  String Nome;
     private String Cognome;
@@ -22,10 +24,13 @@ public class Receiver extends BroadcastReceiver {
     private String ConfPass;
     private String ip;
     private String porta;
+    private String dispositivo;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
+
+
         if(("univpm.iot_for_emergency.View.Registrazione").equals(action)) {
 
             Nome = intent.getStringExtra("nome");
@@ -55,18 +60,21 @@ public class Receiver extends BroadcastReceiver {
         }
 
         if(("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)){
+            String device=intent.getStringExtra("device");
+            dispositivo=device;
+            HomeController homeController=new HomeController();
             int humidity=(int)intent.getDoubleExtra("hum",1000);
             int temperature=(int)intent.getDoubleExtra("temp",1000);
             String humsend= String.valueOf(humidity);
             String tempsend= String.valueOf(temperature);
-            String device=intent.getStringExtra("device");
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+            homeController.updatesaveBeacon(dispositivo,currentDateTimeString,String.valueOf(temperature),String.valueOf(humidity));
             Intent intenteservice=new Intent(context,InvioDatiService.class);
             intenteservice.setAction("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio");
             intenteservice.putExtra("hum",humsend);
             intenteservice.putExtra("temp",tempsend);
             intenteservice.putExtra("data",currentDateTimeString);
-            intenteservice.putExtra("device",device);
+            intenteservice.putExtra("device",dispositivo);
             context.startService(intenteservice);
 
         }

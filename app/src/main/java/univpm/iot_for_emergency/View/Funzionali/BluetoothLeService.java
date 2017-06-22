@@ -26,6 +26,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -34,6 +35,7 @@ import java.util.Date;
 import uk.co.senab.photoview.PhotoViewAttacher;
 import univpm.iot_for_emergency.Controller.HomeController;
 import univpm.iot_for_emergency.Model.TabPunti;
+import univpm.iot_for_emergency.View.Login;
 
 import static android.content.ContentValues.TAG;
 
@@ -153,20 +155,7 @@ public class BluetoothLeService extends Service {
         }
     };
 
-    private boolean refreshDeviceCache(BluetoothGatt gatt){
-        try {
-            BluetoothGatt localBluetoothGatt = gatt;
-            Method localMethod = localBluetoothGatt.getClass().getMethod("refresh", new Class[0]);
-            if (localMethod != null) {
-                boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
-                return bool;
-            }
-        }
-        catch (Exception localException) {
-            Log.e(TAG, "An exception occured while refreshing device");
-        }
-        return false;
-    }
+
 
 
 
@@ -184,7 +173,6 @@ public class BluetoothLeService extends Service {
         }
 
         mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
-        refreshDeviceCache(mBluetoothGatt);
         Log.d(TAG, "Trying to create a new connection.");
         mConnectionState = STATE_CONNECTING;
         return true;
@@ -199,7 +187,8 @@ public class BluetoothLeService extends Service {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mConnectionState = STATE_CONNECTED;
-                broadcasUpdate("univpm.iot_for_emergency.View.Funzionali.Connesso",gatt.getDevice().getAddress());
+                mBluetoothDeviceAddress=gatt.getDevice().getAddress();
+                broadcasUpdate("univpm.iot_for_emergency.View.Funzionali.Connesso",mBluetoothDeviceAddress);
                 Log.i(TAG, "Connected to GATT server.");
                 Log.i(TAG, "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
 
@@ -283,7 +272,6 @@ public class BluetoothLeService extends Service {
         final Intent intent =new Intent(action);
         intent.putExtra("device",device);
         sendBroadcast(intent);
-
     }
 
     public void broadcastUpdate(final String action){
@@ -331,6 +319,10 @@ public class BluetoothLeService extends Service {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Stop");
         return intentFilter;
+    }
+
+    public void displayToast(String message){
+        Toast.makeText(BluetoothLeService.this, message, Toast.LENGTH_SHORT).show();
     }
 
 

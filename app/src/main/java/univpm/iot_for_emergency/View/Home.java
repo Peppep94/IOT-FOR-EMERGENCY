@@ -53,6 +53,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private boolean started=false;
 
 
+
     private static final int MY_PERMISSIONS_REQUEST =1 ;
     private BluetoothAdapter mBluetoothAdapter;
     private static final int RQS_ENABLE_BLUETOOTH = 1;
@@ -258,12 +259,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
                 int humidity=(int)intent.getDoubleExtra("hum",1000);
                 int temperature=(int)intent.getDoubleExtra("temp",1000);
-                String device=intent.getStringExtra("device");
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
                 String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                 toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
-                homeController.updatesaveBeacon(device,currentDateTimeString,String.valueOf(temperature),String.valueOf(humidity));
-                displayToast("ricevuti");
                 /*String humsend= String.valueOf(humidity);
                 String tempsend= String.valueOf(temperature);
                 Intent inviointent=new Intent("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio");
@@ -272,7 +270,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 inviointent.putExtra("data",currentDateTimeString);
                 inviointent.putExtra("device",device);
                 sendBroadcast(inviointent);*/
-
 
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Connesso").equals(action)) {
