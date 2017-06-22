@@ -123,6 +123,7 @@ public class Login extends AppCompatActivity {
             Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
             contatore=contatore+1;
         }else{
+            sessione.DatiServer(ip,porta);
             //Leggo il file Dati.xls dove ci sono le coordinate dei punti dove sono posizionati i beacon sulle varie mappe
             LetturaMappa();
             //Invio una richiesta di salvare in locale, tutti gli utenti registrati presenti sul server.

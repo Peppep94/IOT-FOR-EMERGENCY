@@ -40,6 +40,7 @@ public class InvioDatiService extends Service {
     String device;
     String currentdate;
     private String azione;
+    private Sessione sessione;
 
     JSONObject jsonObject = new JSONObject();
 
@@ -48,6 +49,9 @@ public class InvioDatiService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         final String action = intent.getAction();
         azione=action;
+        sessione=new Sessione(this);
+        ip=sessione.ip();
+        porta=sessione.porta();
 
         if(("univpm.iot_for_emergency.View.Registrazione").equals(action)) {
 
@@ -59,8 +63,6 @@ public class InvioDatiService extends Service {
             Problemi = intent.getStringExtra("problemi");
             DataN = intent.getStringExtra("datan");
             ConfPass = intent.getStringExtra("confpass");
-            ip=intent.getStringExtra("ip");
-            porta=intent.getStringExtra("porta");
 
 
             try {
@@ -107,7 +109,7 @@ public class InvioDatiService extends Service {
             }
 
 
-            new send().execute("http://192.168.1.100:8080/MyFirsRestService/utenti/beacon");
+            new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/beacon");
 
         }
 

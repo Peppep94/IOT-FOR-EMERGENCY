@@ -21,8 +21,23 @@ public class Sessione {
         editor.commit();
     }
 
+    public void DatiServer(String ip,String porta)
+    {
+        editor.putString("ip",ip);
+        editor.putString("porta",porta);
+        editor.commit();
+    }
+
     public boolean loggedin(){
         return log.getBoolean("loggedInmode", false);
+    }
+
+    public String ip(){
+        return log.getString("ip","null");
+    }
+
+    public String porta(){
+        return log.getString("porta","null");
     }
 
     public String user(){

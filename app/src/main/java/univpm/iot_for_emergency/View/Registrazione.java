@@ -35,6 +35,7 @@ import java.util.Date;
 import univpm.iot_for_emergency.Controller.RegistraController;
 import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.R;
+import univpm.iot_for_emergency.View.Funzionali.Sessione;
 
 public class Registrazione extends AppCompatActivity {
 
@@ -46,10 +47,9 @@ public class Registrazione extends AppCompatActivity {
     private String Problemi;
     private String DataN;
     private String ConfPass;
-    String result;
     String ip;
     String porta;
-    private TabUtente tabUtente;
+    private Sessione sessione;
     protected TextView mDateDisplay;
     protected ImageButton mPickDate;
     protected int mYear;
@@ -84,10 +84,10 @@ public class Registrazione extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        sessione=new Sessione(this);
+        ip=sessione.ip();
+        porta=sessione.porta();
         final Button bRegister=(Button) findViewById(R.id.buttonRegistra);
-        ip = getIntent().getExtras().getString("ip");
-        porta = getIntent().getExtras().getString("porta");
 
         spinner();
         datepicker();
@@ -203,8 +203,6 @@ public class Registrazione extends AppCompatActivity {
         intent.putExtra("problemi", Problemi);
         intent.putExtra("datan", DataN);
         intent.putExtra("confpass", ConfPass);
-        intent.putExtra("ip",ip);
-        intent.putExtra("porta",porta);
         sendBroadcast(intent);
 
     }

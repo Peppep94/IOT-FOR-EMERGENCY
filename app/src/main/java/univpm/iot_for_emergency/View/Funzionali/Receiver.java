@@ -22,8 +22,6 @@ public class Receiver extends BroadcastReceiver {
     private String Problemi;
     private String DataN;
     private String ConfPass;
-    private String ip;
-    private String porta;
     private String dispositivo;
 
     @Override
@@ -41,8 +39,6 @@ public class Receiver extends BroadcastReceiver {
             Problemi = intent.getStringExtra("problemi");
             DataN = intent.getStringExtra("datan");
             ConfPass = intent.getStringExtra("confpass");
-            ip=intent.getStringExtra("ip");
-            porta=intent.getStringExtra("porta");
 
             Intent intentservice = new Intent(context, InvioDatiService.class);
             intentservice.setAction("univpm.iot_for_emergency.View.Registrazione");
@@ -54,8 +50,6 @@ public class Receiver extends BroadcastReceiver {
             intentservice.putExtra("problemi", Problemi);
             intentservice.putExtra("datan", DataN);
             intentservice.putExtra("confpass", ConfPass);
-            intentservice.putExtra("ip",ip);
-            intentservice.putExtra("porta",porta);
             context.startService(intentservice);
         }
 

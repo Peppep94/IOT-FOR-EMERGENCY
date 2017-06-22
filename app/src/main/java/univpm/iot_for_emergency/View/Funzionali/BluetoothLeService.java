@@ -59,6 +59,7 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private boolean logout;
+    private String finaladdress;
 
 
 
@@ -188,6 +189,7 @@ public class BluetoothLeService extends Service {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mConnectionState = STATE_CONNECTED;
                 mBluetoothDeviceAddress=gatt.getDevice().getAddress();
+                finaladdress=gatt.getDevice().getAddress();
                 broadcasUpdate("univpm.iot_for_emergency.View.Funzionali.Connesso",mBluetoothDeviceAddress);
                 Log.i(TAG, "Connected to GATT server.");
                 Log.i(TAG, "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
@@ -254,12 +256,12 @@ public class BluetoothLeService extends Service {
     }
 
 
-    /*Tutte le funzioni broadcast inviano un intent caratterizzato da un'azione e da dari dati, il receiver della home si comporta in modo diverso in base all'azione dell'intent */
+    /*Tutte le funzioni broadcast inviano un intent caratterizzato da un'azione e da dati dati, il receiver si comporta in modo diverso in base all'azione dell'intent */
     private void broadcastUpdate(final String action,BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
         double humidity = SensorTagData.extractHumidity(characteristic);
         double temperature = SensorTagData.extractHumAmbientTemperature(characteristic);
-        intent.putExtra("device",mBluetoothDeviceAddress);
+        intent.putExtra("device",finaladdress);
         intent.putExtra("hum",humidity);
         intent.putExtra("temp",temperature);
         sendBroadcast(intent);
