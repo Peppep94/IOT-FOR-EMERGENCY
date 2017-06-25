@@ -60,6 +60,7 @@ public class BluetoothLeService extends Service {
     private BluetoothGatt mBluetoothGatt;
     private boolean logout;
     private String finaladdress;
+    private static BluetoothGatt finalgatt;
 
 
 
@@ -173,7 +174,8 @@ public class BluetoothLeService extends Service {
             return false;
         }
 
-        mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
+        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+        finalgatt=mBluetoothGatt;
         Log.d(TAG, "Trying to create a new connection.");
         mConnectionState = STATE_CONNECTING;
         return true;
@@ -192,12 +194,12 @@ public class BluetoothLeService extends Service {
                 finaladdress=gatt.getDevice().getAddress();
                 broadcasUpdate("univpm.iot_for_emergency.View.Funzionali.Connesso",mBluetoothDeviceAddress);
                 Log.i(TAG, "Connected to GATT server.");
-                Log.i(TAG, "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
+                Log.i(TAG, "Attempting to start service discovery:" + finalgatt.discoverServices());
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 mConnectionState = STATE_DISCONNECTED;
                 Log.i(TAG, "Disconnected from GATT server.");
-                unregisterReceiver(mGattUpdateReceiver);
+                //unregisterReceiver(mGattUpdateReceiver);
             }
             gatt.discoverServices();
         }
@@ -265,7 +267,10 @@ public class BluetoothLeService extends Service {
         intent.putExtra("hum",humidity);
         intent.putExtra("temp",temperature);
         sendBroadcast(intent);
-        disconnect();
+        if(!disconnect()){
+            disconnect();
+        }
+        Log.w(TAG, "BluetoothGatt "+mBluetoothGatt);
         close();
 
     }
@@ -282,13 +287,12 @@ public class BluetoothLeService extends Service {
     }
 
     public boolean disconnect() {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+        if (mBluetoothAdapter == null || finalgatt == null) {
+            mBluetoothGatt=finalgatt;
             Log.w(TAG, "BluetoothAdapter not initialized");
-            getBluetoothAdapterAndLeScanner();
-            disconnect();
             return false;
         }
-        mBluetoothGatt.disconnect();
+        finalgatt.disconnect();
         return true;
     }
 

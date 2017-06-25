@@ -1,7 +1,6 @@
 package univpm.iot_for_emergency.View;
 
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,39 +10,27 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
-import uk.co.senab.photoview.PhotoViewAttacher;
-import univpm.iot_for_emergency.Controller.HomeController;
 import univpm.iot_for_emergency.Controller.RegistraController;
 import univpm.iot_for_emergency.Model.TabPunti;
 import univpm.iot_for_emergency.Model.TabUtente;
-import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.R;
@@ -104,7 +91,10 @@ public class Login extends AppCompatActivity {
                     Passtext.setEnabled(false);
                     registerLink.setEnabled(false);
                     Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+                    sessione.DatiServer("","");
+                    controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
                     contatore = contatore + 1;
+
                 }
             }
         }, 5000);
@@ -121,6 +111,8 @@ public class Login extends AppCompatActivity {
             Passtext.setEnabled(false);
             registerLink.setEnabled(false);
             Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+            sessione.DatiServer("","");
+            controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
             contatore=contatore+1;
         }else{
             sessione.DatiServer(ip,porta);
@@ -132,7 +124,6 @@ public class Login extends AppCompatActivity {
 
         //http://31.170.166.75:8080/
 
-        controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
 
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,8 +143,6 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent registerIntent =new Intent(Login.this,Registrazione.class);
-                registerIntent.putExtra("ip", ip);//passo ip e porta a Registrazione.class
-                registerIntent.putExtra("porta", porta);
                 startActivity(registerIntent);
             }
         });
@@ -176,8 +165,20 @@ public class Login extends AppCompatActivity {
 
         if (sessione.loggedin()){
             contatore=contatore+1;
-            startActivity(new Intent(Login.this,Home.class));
-            finish();
+            final ProgressDialog progressDialog = new ProgressDialog(Login.this,
+                    R.style.AppTheme_Dark_Dialog);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Autenticazione...");
+            progressDialog.show();
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            // On complete call either onLoginSuccess or onLoginFailed
+                            Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
+                            Login.this.startActivity(intent);
+                            progressDialog.dismiss();
+                        }
+                    }, 1500);
         }
     }
 
@@ -296,7 +297,9 @@ public class Login extends AppCompatActivity {
         String xx = "";
         Cell cell=null;
                 if(s.getRows()<2)
-                {xx=", ,";}
+                {
+                    xx=", ,";
+                }
                 else {
                     cell = s.getCell(0, 1);
                     xx = xx + cell.getContents() + ",";
@@ -360,9 +363,7 @@ public class Login extends AppCompatActivity {
                         public void run() {
                             // On complete call either onLoginSuccess or onLoginFailed
                             Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
-                            intent.putExtra("user", User);
                             Login.this.startActivity(intent);
-                            // onLoginFailed();
                             progressDialog.dismiss();
                         }
                     }, 1500);
@@ -519,6 +520,8 @@ public class Login extends AppCompatActivity {
                     Passtext.setEnabled(false);
                     registerLink.setEnabled(false);
                     Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+                    sessione.DatiServer("","");
+                    controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
                     contatore=contatore+1;
                 }
             }

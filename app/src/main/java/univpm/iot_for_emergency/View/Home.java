@@ -228,9 +228,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             {
                 Toast.makeText(getApplicationContext(),"Non sei abilitato alla modifica",Toast.LENGTH_LONG).show(); //in caso di utente guest non permetto la modifica
             }
-            else {
-                Intent intent = new Intent(univpm.iot_for_emergency.View.Home.this, Modifica_dati.class); //reinderizzo a Modificadati
-                univpm.iot_for_emergency.View.Home.this.startActivity(intent);
+            else if("".equals(sessione.ip()))
+            {
+                Toast.makeText(getApplicationContext(),"Sei offline",Toast.LENGTH_LONG).show(); //in caso di utente guest non permetto la modifica
+
+            }
+            else{
+                     Intent intent = new Intent(univpm.iot_for_emergency.View.Home.this, Modifica_dati.class); //reinderizzo a Modificadati
+                     univpm.iot_for_emergency.View.Home.this.startActivity(intent);
             }
         } else if (id == R.id.logout) {
             loguot();
