@@ -1,5 +1,7 @@
 package univpm.iot_for_emergency.Model;
 
+import android.util.Log;
+
 import com.orm.SugarRecord;
 
 import java.util.List;
@@ -52,6 +54,25 @@ public class TabPunti extends SugarRecord{
         coord[1]= Integer.parseInt(tabPunti.get(0).y);
         coord[2]= Integer.parseInt(tabPunti.get(0).quota);*/
         return tabPunti.get(0);
+    }
+
+    public List<TabPunti> TrovaCoordPericoloQuotaModel(String[] address)
+    {
+        List<TabPunti> tabPunti = TabPunti.find(TabPunti.class,"address=?",address[0]);
+
+        for (int i=1;i<address.length;i++)
+        {
+            tabPunti.add(i,TabPunti.find(TabPunti.class,"address=?",address[i]).get(0));
+
+            Log.e("tabpunti",address[i]);
+        }
+
+
+        /*int[] coord={0,0};
+        coord[0]= Integer.parseInt(tabPunti.get(0).x);
+        coord[1]= Integer.parseInt(tabPunti.get(0).y);
+        coord[2]= Integer.parseInt(tabPunti.get(0).quota);*/
+        return tabPunti;
     }
 
 

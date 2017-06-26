@@ -95,7 +95,6 @@ public class InvioDatiService extends Service {
             device=intent.getStringExtra("device");
             currentdate =intent.getStringExtra("data");
 
-            displayToast(currentdate);
 
             try {
                 jsonObject.put("umd", hum);
@@ -108,8 +107,23 @@ public class InvioDatiService extends Service {
                 e.printStackTrace();
             }
 
-
             new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/beacon");
+        }
+
+
+        if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(action)) {
+
+            device=intent.getStringExtra("device");
+            String user=intent.getStringExtra("user");
+
+            try {
+                jsonObject.put("user", user);
+                jsonObject.put("address", device);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/beacon2");
 
         }
 
@@ -229,9 +243,33 @@ public class InvioDatiService extends Service {
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio").equals(azione)) {
 
-                displayToast(result);
-
             }
+
+            if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(azione)) {
+                final String risultato=result;
+                if (risultato!=null) {
+                    String a1[] = result.split(",");
+                    if (a1.length > 1) {
+                        temp = a1[0];
+                        hum = a1[1];
+                        String data = a1[2];
+                        String address[] = new String[a1.length-3];
+                        for (int i=3;i<a1.length;i++)
+                        {
+                            address[i-3]=a1[i];
+                        }
+                        final Intent intent = new Intent("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server");
+                        intent.putExtra("hum", hum);
+                        intent.putExtra("temp", temp);
+                        intent.putExtra("data", data);
+                        intent.putExtra("device",device);
+                        intent.putExtra("address",address);
+                        sendBroadcast(intent);
+                    }
+                }
+            }
+
+
 
         }
     }

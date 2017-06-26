@@ -1,9 +1,13 @@
 package univpm.iot_for_emergency.Model;
 
 
+import android.widget.Toast;
+
 import com.orm.SugarRecord;
 
 import java.util.List;
+
+import univpm.iot_for_emergency.View.Home;
 
 public class TabDatiBeacon extends SugarRecord{
 

@@ -67,7 +67,6 @@ public class Login extends AppCompatActivity {
         progressDialogDB.setIndeterminate(true);
         progressDialogDB.setMessage("Connessione al Server...");
         progressDialogDB.setCancelable(false);
-        progressDialogDB.show();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -92,7 +91,7 @@ public class Login extends AppCompatActivity {
                     registerLink.setEnabled(false);
                     Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
                     sessione.DatiServer("","");
-                    controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
+                    //controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
                     contatore = contatore + 1;
 
                 }
@@ -112,7 +111,7 @@ public class Login extends AppCompatActivity {
             registerLink.setEnabled(false);
             Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
             sessione.DatiServer("","");
-            controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
+            //controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
             contatore=contatore+1;
         }else{
             sessione.DatiServer(ip,porta);
@@ -124,6 +123,7 @@ public class Login extends AppCompatActivity {
 
         //http://31.170.166.75:8080/
 
+        controlloPrimoAvvio();
 
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,6 +165,8 @@ public class Login extends AppCompatActivity {
 
         if (sessione.loggedin()){
             contatore=contatore+1;
+            //startActivity(new Intent(Login.this,Home.class));
+            //finish();
             final ProgressDialog progressDialog = new ProgressDialog(Login.this,
                     R.style.AppTheme_Dark_Dialog);
             progressDialog.setIndeterminate(true);
@@ -179,7 +181,8 @@ public class Login extends AppCompatActivity {
                             progressDialog.dismiss();
                         }
                     }, 1500);
-        }
+        }else
+        {progressDialogDB.show();}
     }
 
     private void LetturaMappa() {
@@ -448,7 +451,6 @@ public class Login extends AppCompatActivity {
         protected void onPostExecute(String s) {
             final String controllo= result;
             TabUtente.deleteAll(TabUtente.class);
-
             if (controllo!=null && controllo.length()>0) {
 
                 String pippo[] = result.split(",");
@@ -521,7 +523,7 @@ public class Login extends AppCompatActivity {
                     registerLink.setEnabled(false);
                     Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
                     sessione.DatiServer("","");
-                    controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
+                    //controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
                     contatore=contatore+1;
                 }
             }

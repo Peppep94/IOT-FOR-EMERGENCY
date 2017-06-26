@@ -22,6 +22,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -37,7 +38,11 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import static android.R.attr.thickness;
 import static android.R.attr.uiOptions;
@@ -260,6 +265,29 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             final String action = intent.getAction();
             HomeController homeController=new HomeController();
 
+            if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server").equals(action)) {
+                String device=intent.getStringExtra("device");
+                String humidity=intent.getStringExtra("hum");
+                String temperature=intent.getStringExtra("temp");
+                String address[]= intent.getStringArrayExtra("address");
+                toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
+                String currentDateTimeString=intent.getStringExtra("data");
+                toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
+                TabPunti coord=homeController.TrovaCoordQuota(device);
+                List<TabPunti> pericolo=homeController.TrovaCoordQuotaPericolo(address);
+                imageView.init(toolbar,Integer.parseInt(coord.x),Integer.parseInt(coord.y),Integer.parseInt(coord.quota),pericolo);
+                PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
+                photoViewAttacher.update();
+                photoViewAttacher.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        fullScreen();
+                        return false;
+                    }
+                });
+
+            }
+
 
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
                 int humidity=(int)intent.getDoubleExtra("hum",1000);
@@ -267,14 +295,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
                 String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                 toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
-                /*String humsend= String.valueOf(humidity);
-                String tempsend= String.valueOf(temperature);
-                Intent inviointent=new Intent("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio");
-                inviointent.putExtra("hum",humsend);
-                inviointent.putExtra("temp",tempsend);
-                inviointent.putExtra("data",currentDateTimeString);
-                inviointent.putExtra("device",device);
-                sendBroadcast(inviointent);*/
 
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Connesso").equals(action)) {
@@ -306,6 +326,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Ricevuti");
+        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server");
         intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Connesso");
         intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Trovato");
         return intentFilter;

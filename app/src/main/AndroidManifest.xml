@@ -67,6 +67,7 @@
             <intent-filter>
                 <action android:name="univpm.iot_for_emergency.View.Funzionali.Ricevuti" />
                 <action android:name="univpm.iot_for_emergency.View.Registrazione"/>
+                <action android:name="univpm.iot_for_emergency.View.Funzionali.Trovato"/>
             </intent-filter>
         </receiver>
 

@@ -1,7 +1,12 @@
 package univpm.iot_for_emergency.Controller;
 
+import android.widget.Toast;
+
+import java.util.List;
+
 import univpm.iot_for_emergency.Model.TabDatiBeacon;
 import univpm.iot_for_emergency.Model.TabPunti;
+import univpm.iot_for_emergency.View.Home;
 
 public class HomeController {
 
@@ -30,5 +35,9 @@ public class HomeController {
 
     public TabPunti TrovaCoordQuota(String address){
        return tabPunti.TrovaCoordQuotaModel(address);
+    }
+
+    public List<TabPunti> TrovaCoordQuotaPericolo(String[] address){
+        return tabPunti.TrovaCoordPericoloQuotaModel(address);
     }
 }
