@@ -47,19 +47,6 @@ public class Receiver extends BroadcastReceiver {
                     intentservice.putExtra("user",sessione.user());
                     context.startService(intentservice);
                 }
-                Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                Intent i=new Intent(context,Login.class);
-                PendingIntent pi= PendingIntent.getActivity(context, 0, i, 0);
-                NotificationCompat.Builder n  = new NotificationCompat.Builder(context)
-                        .setContentTitle("Beacon trovato")
-                        .setContentText("Address: "+device)
-                        .setColor(Color.GREEN)
-                        .setSound(sound)
-                        .setContentIntent(pi)
-                        .setAutoCancel(true)
-                        .setSmallIcon(R.drawable.stickman2);
-                NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.notify(1, n.build());
             }
         
 

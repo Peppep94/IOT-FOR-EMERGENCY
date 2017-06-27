@@ -194,6 +194,7 @@ public class InvioDatiService extends Service {
                 new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti");
             }
         }
+
         if(("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio").equals(action)) {
 
             hum= intent.getStringExtra("hum");
@@ -315,33 +316,14 @@ public class InvioDatiService extends Service {
 
                 displayToast(result);
                 if(result.equals("Utente Registrato Server")){
-                    Intent intent = new Intent(InvioDatiService.this,Login.class);
-                    startActivity(intent);
+                    Intent intent = new Intent("univpm.iot_for_emergency.View.Registrazione.Risposta");
+                    sendBroadcast(intent);
                 }
 
 
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio").equals(azione)) {
-
-                if (("Pericolo!").equals(result)){
-
-                    Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                    Intent i=new Intent(getBaseContext(),Login.class);
-                    PendingIntent pi= PendingIntent.getActivity(getBaseContext(), 0, i, 0);
-                    NotificationCompat.Builder n  = new NotificationCompat.Builder(getBaseContext())
-                            .setContentTitle("C'è un pericolo!!")
-                            .setContentText("Address: "+device)
-                            .setColor(Color.GREEN)
-                            .setSound(sound)
-                            .setContentIntent(pi)
-                            .setAutoCancel(true)
-                            .setSmallIcon(R.drawable.stickman2);
-                    NotificationManager mNotificationManager = (NotificationManager) getBaseContext().getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.notify(1, n.build());
-
-
-
-                }
+                
 
             }
 
@@ -383,7 +365,28 @@ public class InvioDatiService extends Service {
                         {
                             address[i-3]=a1[i];
                         }
-                        final Intent intent = new Intent("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server");
+                        final Intent intent = new Intent();
+                        if (address.length!=0)
+                        {
+                            intent.setAction("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server");
+
+                            Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                            Intent i=new Intent(getBaseContext(),Login.class);
+                            PendingIntent pi= PendingIntent.getActivity(getBaseContext(), 0, i, 0);
+                            NotificationCompat.Builder n  = new NotificationCompat.Builder(getBaseContext())
+                                    .setContentTitle("C'è un pericolo!!")
+                                    .setContentText("Address: "+device)
+                                    .setColor(Color.GREEN)
+                                    .setSound(sound)
+                                    .setContentIntent(pi)
+                                    .setAutoCancel(true)
+                                    .setSmallIcon(R.drawable.stickman2);
+                            NotificationManager mNotificationManager = (NotificationManager) getBaseContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                            mNotificationManager.notify(1, n.build());
+
+                        }else{
+                            intent.setAction("univpm.iot_for_emergency.View.Funzionali.Ricevuti.");
+                        }
                         intent.putExtra("hum", hum);
                         intent.putExtra("temp", temp);
                         intent.putExtra("data", data);

@@ -124,7 +124,7 @@ public class Login extends AppCompatActivity {
 
         //http://31.170.166.75:8080/
 
-        controlloPrimoAvvio();
+
 
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,17 +161,7 @@ public class Login extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
-    //controlla se è già stata avviata la sessione
-    private void controlloPrimoAvvio(){
 
-        if (sessione.loggedin()){
-
-            Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
-            Login.this.startActivity(intent);
-
-        }
-
-    }
 
     private void LetturaMappa() {
         TabPunti.deleteAll(TabPunti.class);
@@ -323,31 +313,6 @@ public class Login extends AppCompatActivity {
 
         }
 
-        /*
-        if(loginController.controlUserPasscontroller(User,Pass)){  //controllo se esiste un utente registrato corrispondente
-            bLogin.setEnabled(false);
-            final ProgressDialog progressDialog = new ProgressDialog(Login.this,
-                    R.style.AppTheme_Dark_Dialog);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Autenticazione...");
-            progressDialog.show();
-
-            sessione.UtenteLoggato(true,User); //avvio la sessione
-
-            new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            // On complete call either onLoginSuccess or onLoginFailed
-                            Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
-                            Login.this.startActivity(intent);
-                            progressDialog.dismiss();
-                        }
-                    }, 1500);
-        }else
-        {
-            Toast.makeText(getApplicationContext(),"User o password sbagliati", Toast.LENGTH_SHORT).show(); //in caso di esito negativo del login mostro u nmessaggio di errore
-        }
-        */
     }
 
     private void LoginGuest(){

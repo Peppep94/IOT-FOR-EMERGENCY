@@ -2,9 +2,13 @@ package univpm.iot_for_emergency.View;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +39,7 @@ import java.util.Date;
 import univpm.iot_for_emergency.Controller.RegistraController;
 import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.R;
+import univpm.iot_for_emergency.View.Funzionali.InvioDatiService;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 
 public class Registrazione extends AppCompatActivity {
@@ -193,7 +198,7 @@ public class Registrazione extends AppCompatActivity {
                 .append(mYear).append(" "));
         DataN=DataN.replace("/","-");
 
-        Intent intent=new Intent();
+        Intent intent=new Intent(this, InvioDatiService.class);
         intent.setAction("univpm.iot_for_emergency.View.Registrazione");
         intent.putExtra("nome", Nome);
         intent.putExtra("cognome", Cognome);
@@ -203,7 +208,8 @@ public class Registrazione extends AppCompatActivity {
         intent.putExtra("problemi", Problemi);
         intent.putExtra("datan", DataN);
         intent.putExtra("confpass", ConfPass);
-        sendBroadcast(intent);
+        startService(intent);
+
 
     }
 
@@ -213,5 +219,32 @@ public class Registrazione extends AppCompatActivity {
     }
 
 
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+           String action=intent.getAction();
+            if(("univpm.iot_for_emergency.View.Registrazione.Risposta").equals(action)){
+                finish();
+            }
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+    }
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("univpm.iot_for_emergency.View.Registrazione.Risposta");
+        return intentFilter;
+    }
 
 }
