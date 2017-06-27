@@ -1,14 +1,21 @@
 package univpm.iot_for_emergency.View.Funzionali;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,8 +26,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
+import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.Controller.RegistraController;
+import univpm.iot_for_emergency.Model.TabUtente;
+import univpm.iot_for_emergency.R;
 import univpm.iot_for_emergency.View.Login;
 
 public class InvioDatiService extends Service {
@@ -34,6 +45,12 @@ public class InvioDatiService extends Service {
     private String ConfPass;
     private String ip;
     private String porta;
+    private String codice;
+    private String x;
+    private String y;
+    private String quota;
+    private String address;
+    private String data;
     String result;
     String hum;
     String temp;
@@ -52,6 +69,95 @@ public class InvioDatiService extends Service {
         sessione=new Sessione(this);
         ip=sessione.ip();
         porta=sessione.porta();
+
+
+
+        if(("univpm.iot_for_emergency.View.Login.Utenti").equals(action)) {
+
+            User = intent.getStringExtra("user");
+            Pass= intent.getStringExtra("pass");
+
+            try {
+                jsonObject.put("user",User);
+                jsonObject.put("pass",Pass);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+                new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/db");
+        }
+
+        if(("univpm.iot_for_emergency.View.Login.Punti").equals(action)) {
+
+            int z1=0;
+            LoginController salvapunti=new LoginController();
+            String a1[]=intent.getStringArrayExtra("arraypunti");
+            ArrayList<String> cod_app= new ArrayList<String> ();
+            ArrayList<String> x_app= new ArrayList<String> ();
+            ArrayList<String> y_app= new ArrayList<String> ();
+            ArrayList<String> quota_app= new ArrayList<String> ();
+            ArrayList<String> address_app= new ArrayList<String> ();
+            ArrayList<String> data_app= new ArrayList<String> ();
+
+
+            int i=0;
+            while (z1 < a1.length) {
+                codice = a1[z1];
+                codice.trim();
+                cod_app.add(codice);
+                x = a1[z1 + 1];
+                x.trim();
+                x_app.add(x);
+                y = a1[z1 + 2];
+                y.trim();
+                y_app.add(y);
+                quota = a1[z1 + 3];
+                quota.trim();
+                quota_app.add(quota);
+                address = a1[z1 + 4];
+                address.trim();
+                address_app.add(address);
+                data = a1[z1 + 5];
+                data.trim();
+                data_app.add(data);
+
+                int h=salvapunti.SalvaPuntiController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
+                switch (h) {
+                    case 0:
+                        displayToast("Punti x,y mancanti!");
+                        break;
+                    case 1:
+                        displayToast("Quota mancante!");
+                        break;
+                    case 2:
+                        Log.e("Codice:", a1[z1] + " inserito!");
+
+                        z1 = z1 + 6;
+                        i=i+1;
+            }
+                //Log.e("data",data);
+            }
+                try {
+                    jsonObject.put("codice", new JSONArray(cod_app));
+                    jsonObject.put("x", new JSONArray(x_app));
+                    jsonObject.put("y", new JSONArray(y_app));
+                    jsonObject.put("quota", new JSONArray(quota_app));
+                    jsonObject.put("address", new JSONArray(address_app));
+                    jsonObject.put("data", new JSONArray(data_app));
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/punti");
+
+
+
+
+
+
+        }
 
         if(("univpm.iot_for_emergency.View.Registrazione").equals(action)) {
 
@@ -208,40 +314,59 @@ public class InvioDatiService extends Service {
             if(("univpm.iot_for_emergency.View.Registrazione").equals(azione)) {
 
                 displayToast(result);
-
-                if (result.equals("Utente Registrato Server")){
-
-                    RegistraController registraController=new RegistraController();
-                    int c=registraController.Registracontroller(User,Nome,Cognome,Pass,DataN,Problemi,Sesso,ConfPass);
-
-                    switch (c) {
-                        case 0:
-                            displayToast("I campi contrassegnati con * non posso essere vuoti");
-                            break;
-                        case 1:
-                            displayToast("Le password non corrispondono");
-                            break;
-                        case 2:
-                            displayToast("Username non disponibile");
-                            break;
-                        case 3:
-                            displayToast("Utente registrato Locale ");
-                            startActivity(new Intent(InvioDatiService.this,Login.class));
-                            stopSelf();
-
-                            break;
-                    }
-
-
-                }else{
-
-                    displayToast("Utente non registrato in locale!");
-
+                if(result.equals("Utente Registrato Server")){
+                    Intent intent = new Intent(InvioDatiService.this,Login.class);
+                    startActivity(intent);
                 }
 
 
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio").equals(azione)) {
+
+                if (("Pericolo!").equals(result)){
+
+                    Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Intent i=new Intent(getBaseContext(),Login.class);
+                    PendingIntent pi= PendingIntent.getActivity(getBaseContext(), 0, i, 0);
+                    NotificationCompat.Builder n  = new NotificationCompat.Builder(getBaseContext())
+                            .setContentTitle("C'è un pericolo!!")
+                            .setContentText("Address: "+device)
+                            .setColor(Color.GREEN)
+                            .setSound(sound)
+                            .setContentIntent(pi)
+                            .setAutoCancel(true)
+                            .setSmallIcon(R.drawable.stickman2);
+                    NotificationManager mNotificationManager = (NotificationManager) getBaseContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.notify(1, n.build());
+
+
+
+                }
+
+            }
+
+            if(("univpm.iot_for_emergency.View.Login.Punti").equals(azione)) {
+
+                int c=0;
+                if(c==0){
+                    if(("online").equals(result)){
+                        c=c+1;
+                        Intent intent= new Intent("univpm.iot_for_emergency.View.Login.Punti");
+                        sendBroadcast(intent);
+                    }
+                }
+
+
+
+
+            }
+
+            if(("univpm.iot_for_emergency.View.Login.Utenti").equals(azione)) {
+                Intent intent= new Intent("univpm.iot_for_emergency.View.Login.Utenti");
+                intent.putExtra("risultato", result);
+                //displayToast(result);
+                sendBroadcast(intent);
+
 
             }
 

@@ -28,6 +28,7 @@ public class Receiver extends BroadcastReceiver {
 
 
             if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(action)){
+
                 if (!"".equals(sessione.ip())) {
                     String device = intent.getStringExtra("device");
                     Intent intentservice=new Intent(context, InvioDatiService.class);

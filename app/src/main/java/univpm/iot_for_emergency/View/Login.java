@@ -31,6 +31,7 @@ import jxl.read.biff.BiffException;
 import univpm.iot_for_emergency.Controller.RegistraController;
 import univpm.iot_for_emergency.Model.TabPunti;
 import univpm.iot_for_emergency.Model.TabUtente;
+import univpm.iot_for_emergency.View.Funzionali.InvioDatiService;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.R;
@@ -51,22 +52,18 @@ public class Login extends AppCompatActivity {
     String data1;
     private LoginController loginController;
     private final static String TAG = Login.class.getSimpleName();
-
+    private ProgressDialog progressDialogDB;
     private Button bLogin;
     private TextView registerLink;
     private EditText Usertext;
     private EditText Passtext;
     int contatore;
-    ProgressDialog progressDialogDB;
     Handler mHandler;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        progressDialogDB= new ProgressDialog(Login.this, R.style.AppTheme_Dark_Dialog);
-        progressDialogDB.setIndeterminate(true);
-        progressDialogDB.setMessage("Connessione al Server...");
-        progressDialogDB.setCancelable(false);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -80,10 +77,15 @@ public class Login extends AppCompatActivity {
         Passtext = (EditText) findViewById(R.id.Password);
 
         mHandler=new Handler();
+
+        progressDialogDB=new ProgressDialog(Login.this, R.style.AppTheme_Dark);
+        progressDialogDB.setIndeterminate(true);
+        progressDialogDB.setMessage("Connessione Server...");
+        progressDialogDB.show();
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (contatore==0) {
+                if(contatore==0){
                     progressDialogDB.dismiss();
                     bLogin.setEnabled(false);
                     Usertext.setEnabled(false);
@@ -91,12 +93,12 @@ public class Login extends AppCompatActivity {
                     registerLink.setEnabled(false);
                     Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
                     sessione.DatiServer("","");
-                    //controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
-                    contatore = contatore + 1;
+                    contatore=contatore+1;
 
                 }
-            }
-        }, 5000);
+
+            }},5000);
+
 
 
         //Leggo il file Server.xls dove ci sono la porta e l'ip
@@ -104,7 +106,6 @@ public class Login extends AppCompatActivity {
 
         if(ip.equals("") || porta.equals("")){
            // displayToast("Errore di accesso al Server!");
-            progressDialogDB.dismiss();
             bLogin.setEnabled(false);
             Usertext.setEnabled(false);
             Passtext.setEnabled(false);
@@ -118,7 +119,7 @@ public class Login extends AppCompatActivity {
             //Leggo il file Dati.xls dove ci sono le coordinate dei punti dove sono posizionati i beacon sulle varie mappe
             LetturaMappa();
             //Invio una richiesta di salvare in locale, tutti gli utenti registrati presenti sul server.
-            new Login.send().execute("http://"+ip+":"+porta+"/MyFirsRestService/utenti/db");
+            //new Login.send().execute("http://"+ip+":"+porta+"/MyFirsRestService/utenti/db");
         }
 
         //http://31.170.166.75:8080/
@@ -164,25 +165,12 @@ public class Login extends AppCompatActivity {
     private void controlloPrimoAvvio(){
 
         if (sessione.loggedin()){
-            contatore=contatore+1;
-            //startActivity(new Intent(Login.this,Home.class));
-            //finish();
-            final ProgressDialog progressDialog = new ProgressDialog(Login.this,
-                    R.style.AppTheme_Dark_Dialog);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Autenticazione...");
-            progressDialog.show();
-            new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            // On complete call either onLoginSuccess or onLoginFailed
-                            Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
-                            Login.this.startActivity(intent);
-                            progressDialog.dismiss();
-                        }
-                    }, 1500);
-        }else
-        {progressDialogDB.show();}
+
+            Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
+            Login.this.startActivity(intent);
+
+        }
+
     }
 
     private void LetturaMappa() {
@@ -224,51 +212,21 @@ public class Login extends AppCompatActivity {
         }
         System.out.println(xxx);
 
-        int z1 = 0;
+
         String a1[] = xxx.split(",");
-        LoginController salvapunti=new LoginController();
-        while (z1 < a1.length) {
-            codice1=a1[z1];
-            codice1.trim();
-            x1=a1[z1+1];
-            x1.trim();
-            y1=a1[z1+2];
-            y1.trim();
-            quota1=a1[z1+3];
-            quota1.trim();
-            address1=a1[z1+4];
-            address1.trim();
-            data1=a1[z1+5];
-            data1.trim();
 
 
-            new Login.send2().execute("http://"+ip+":"+porta+"/MyFirsRestService/utenti/punti?" +
-                    "codice="+codice1+""+
-                    "&x="+x1+""+
-                    "&y="+y1+""+
-                    "&quota="+quota1+""+
-                    "&address="+address1+""+
-                    "&data="+data1+"");
+        Intent intent=new Intent(this, InvioDatiService.class);
+        intent.setAction("univpm.iot_for_emergency.View.Login.Punti");
+        intent.putExtra("arraypunti", a1);
+        this.startService(intent);
 
-            int h=salvapunti.SalvaPuntiController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
-            switch (h) {
-                case 0:
-                    displayToast("Punti x,y mancanti!");
-                    break;
-                case 1:
-                    displayToast("Quota mancante!");
-                    break;
-                case 2:
-                    Log.e("Codice:", a1[z1] + " inserito!");
 
-                    z1 = z1 + 6;
-
-            }
 
 
         }
 
-    }
+
 
 
     private void controlloServer() {
@@ -338,19 +296,34 @@ public class Login extends AppCompatActivity {
         Pass=Passtext.getText().toString();
         Log.i(TAG, "username "+User);
 
+        boolean controllo= true;
 
         if (User.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(User).matches()) {
             Usertext.setError("Inserisci una mail valida");
+            controllo=false;
         } else {
             Usertext.setError(null);
+
         }
 
         if (Pass.isEmpty() || Pass.length() < 4 || Pass.length() > 10) {
             Passtext.setError("tra 4 e 10 caratteri");
+            controllo= false;
         } else {
             Passtext.setError(null);
+
         }
 
+        if(controllo==true){
+            Intent intent=new Intent(this, InvioDatiService.class);
+            intent.setAction("univpm.iot_for_emergency.View.Login.Utenti");
+            intent.putExtra("user", User);
+            intent.putExtra("pass", Pass);
+            this.startService(intent);
+
+        }
+
+        /*
         if(loginController.controlUserPasscontroller(User,Pass)){  //controllo se esiste un utente registrato corrispondente
             bLogin.setEnabled(false);
             final ProgressDialog progressDialog = new ProgressDialog(Login.this,
@@ -374,7 +347,7 @@ public class Login extends AppCompatActivity {
         {
             Toast.makeText(getApplicationContext(),"User o password sbagliati", Toast.LENGTH_SHORT).show(); //in caso di esito negativo del login mostro u nmessaggio di errore
         }
-
+        */
     }
 
     private void LoginGuest(){
@@ -385,6 +358,7 @@ public class Login extends AppCompatActivity {
         Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
         intent.putExtra("user", User);
         Login.this.startActivity(intent);
+        finish();
 
     }
 
@@ -392,130 +366,11 @@ public class Login extends AppCompatActivity {
         Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private InputStream ApriConnessioneHttp(String urlString) throws IOException
-    {
-        InputStream in = null;
-        int risposta = -1;
-
-        URL url = new URL(urlString);
-        URLConnection conn = url.openConnection();
-
-        if (!(conn instanceof HttpURLConnection))
-            throw new IOException("No connessione HTTP");
-
-        try{
-            HttpURLConnection httpConn = (HttpURLConnection) conn;
-            httpConn.setAllowUserInteraction(false);
-            httpConn.setInstanceFollowRedirects(true);
-            httpConn.setRequestMethod("GET");
-            httpConn.connect();
-            BufferedReader bf = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
-            String value = bf.readLine();
-            System.out.println("Output:"+value);
-            result= value;
-            risposta = httpConn.getResponseCode();
-            if (risposta == HttpURLConnection.HTTP_OK) {
-                in = httpConn.getInputStream();
-            }
-        }
-        catch (Exception ex) {
-            sendBroadcast(new Intent("univpm.iot_for_emergency.View.Offline"));
-            Log.d("Connessione", ex.getLocalizedMessage());
-            throw new IOException("Errore connessione");
-        }
-        return in;
-    }
-
-    private String avvia(String URL)
-    {
-        String bit = null;
-        InputStream in = null;
-        try {
-            in = ApriConnessioneHttp(URL);
-            bit = "Operazione eseguita";
-            in.close();
-        }
-        catch (IOException e1) {
-            //displayToast("Errore connessione Server");
-            //Log.d("Servizio web", e1.getLocalizedMessage());
-        }
-        return bit;
-    }
-
-    private class send extends AsyncTask<String, Void, String> {
-
-        protected String doInBackground(String... urls) {
-            return avvia(urls[0]);
-
-        }
-        protected void onPostExecute(String s) {
-            final String controllo= result;
-            TabUtente.deleteAll(TabUtente.class);
-            if (controllo!=null && controllo.length()>0) {
-
-                String pippo[] = result.split(",");
-
-                int i = 0;
-                RegistraController registraController=new RegistraController();
-                while (i < (pippo.length)) {
-
-                    int c=registraController.Registracontroller(pippo[i + 4],pippo[i], pippo[i + 1], pippo[i + 2], pippo[i + 3],  pippo[i + 5], pippo[i + 6], pippo[i + 2]);
-
-                    switch (c) {
-                        case 0:
-                            displayToast("I campi contrassegnati con * non posso essere vuoti");
-                            break;
-                        case 1:
-                            displayToast("Le password non corrispondono");
-                            break;
-                        case 2:
-                            displayToast("Username non disponibile");
-                            break;
-                        case 3:
-                            Log.e("Utenti:", pippo[i + 4] + " inserito!");
-                            i = i + 7;
-                    }
-
-                }
-                if (i==pippo.length) {
-                    if(contatore==0) {
-                        progressDialogDB.dismiss();
-                        contatore = contatore + 1;
-                    }
-                }
-            } else{
-                displayToast("Database Server vuoto");
-                Log.e("prova2","Db Server Vuoto");
-            }
-
-        }
-    }
-
-    private class send2 extends AsyncTask<String, Void, String> {
-
-        protected String doInBackground(String... urls) {
-            return avvia(urls[0]);
-
-        }
-
-        protected void onPostExecute(String s) {
-
-            final String controllo=result;
-            if (controllo==null)
-            {
-            }
-
-           // Log.e("Punto:",result);
-            //displayToast(result);
-        }
-    }
-
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, Intent intent) {
             final String action = intent.getAction();
             if (("univpm.iot_for_emergency.View.Offline").equals(action)) {
-                progressDialogDB.dismiss();
                 if(contatore<1){
                     bLogin.setEnabled(false);
                     Usertext.setEnabled(false);
@@ -527,6 +382,25 @@ public class Login extends AppCompatActivity {
                     contatore=contatore+1;
                 }
             }
+            if (("univpm.iot_for_emergency.View.Login.Utenti").equals(action)) {
+                String risultato= intent.getStringExtra("risultato");
+                if(risultato.equals("Utente autenticato!")){
+                    sessione.UtenteLoggato(true,User);
+                    Intent intent1 = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
+                    Login.this.startActivity(intent1);
+                    finish();
+                }else{
+                    Toast.makeText(getApplicationContext(),"User o password sbagliati", Toast.LENGTH_SHORT).show(); //in caso di esito negativo del login mostro u nmessaggio di errore
+                }
+
+            }
+            if (("univpm.iot_for_emergency.View.Login.Punti").equals(action)) {
+                progressDialogDB.dismiss();
+                contatore=contatore+1;
+                sessione.DatiServer(ip,porta);
+
+
+            }
         }
     };
 
@@ -535,6 +409,8 @@ public class Login extends AppCompatActivity {
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("univpm.iot_for_emergency.View.Offline");
+        intentFilter.addAction("univpm.iot_for_emergency.View.Login.Utenti");
+        intentFilter.addAction("univpm.iot_for_emergency.View.Login.Punti");
         return intentFilter;
     }
 
