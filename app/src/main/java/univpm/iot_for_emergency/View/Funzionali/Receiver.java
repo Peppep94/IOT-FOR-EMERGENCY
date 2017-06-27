@@ -1,14 +1,24 @@
 package univpm.iot_for_emergency.View.Funzionali;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.text.DateFormat;
 import java.util.Date;
 
 import univpm.iot_for_emergency.Controller.HomeController;
+import univpm.iot_for_emergency.R;
+import univpm.iot_for_emergency.View.Login;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class Receiver extends BroadcastReceiver {
     private  String Nome;
@@ -28,44 +38,30 @@ public class Receiver extends BroadcastReceiver {
 
 
             if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(action)){
+                String device = intent.getStringExtra("device");
 
                 if (!"".equals(sessione.ip())) {
-                    String device = intent.getStringExtra("device");
                     Intent intentservice=new Intent(context, InvioDatiService.class);
                     intentservice.setAction("univpm.iot_for_emergency.View.Funzionali.Trovato");
                     intentservice.putExtra("device",device);
                     intentservice.putExtra("user",sessione.user());
                     context.startService(intentservice);
                 }
+                Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Intent i=new Intent(context,Login.class);
+                PendingIntent pi= PendingIntent.getActivity(context, 0, i, 0);
+                NotificationCompat.Builder n  = new NotificationCompat.Builder(context)
+                        .setContentTitle("Beacon trovato")
+                        .setContentText("Address: "+device)
+                        .setColor(Color.GREEN)
+                        .setSound(sound)
+                        .setContentIntent(pi)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.stickman2);
+                NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(1, n.build());
             }
-
-            if (("univpm.iot_for_emergency.View.Registrazione").equals(action)) {
-
-                if (!"".equals(sessione.ip())) {
-
-                    Nome = intent.getStringExtra("nome");
-                    Cognome = intent.getStringExtra("cognome");
-                    Pass = intent.getStringExtra("pass");
-                    User = intent.getStringExtra("user");
-                    Sesso = intent.getStringExtra("sesso");
-                    Problemi = intent.getStringExtra("problemi");
-                    DataN = intent.getStringExtra("datan");
-                    ConfPass = intent.getStringExtra("confpass");
-
-                    Intent intentservice = new Intent(context, InvioDatiService.class);
-                    intentservice.setAction("univpm.iot_for_emergency.View.Registrazione");
-                    intentservice.putExtra("nome", Nome);
-                    intentservice.putExtra("cognome", Cognome);
-                    intentservice.putExtra("pass", Pass);
-                    intentservice.putExtra("user", User);
-                    intentservice.putExtra("sesso", Sesso);
-                    intentservice.putExtra("problemi", Problemi);
-                    intentservice.putExtra("datan", DataN);
-                    intentservice.putExtra("confpass", ConfPass);
-                    context.startService(intentservice);
-
-                }
-            }
+        
 
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
 
