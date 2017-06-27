@@ -51,6 +51,7 @@ public class InvioDatiService extends Service {
     private String quota;
     private String address;
     private String data;
+    private String olduser;
     String result;
     String hum;
     String temp;
@@ -71,6 +72,51 @@ public class InvioDatiService extends Service {
         porta=sessione.porta();
 
 
+
+        if(("univpm.iot_for_emergency.View.ModificaDati.Utente").equals(action)) {
+
+
+            Nome = intent.getStringExtra("nome");
+            Cognome = intent.getStringExtra("cognome");
+            Pass = intent.getStringExtra("pass");
+            User = intent.getStringExtra("user");
+            Sesso = intent.getStringExtra("sesso");
+            Problemi = intent.getStringExtra("problemi");
+            DataN = intent.getStringExtra("datan");
+            olduser=intent.getStringExtra("olduser");
+
+
+            try {
+                jsonObject.put("nome", Nome);
+                jsonObject.put("cognome", Cognome);
+                jsonObject.put("pass", Pass);
+                jsonObject.put("user", User);
+                jsonObject.put("sesso", Sesso);
+                jsonObject.put("problemi", Problemi);
+                jsonObject.put("datan", DataN);
+                jsonObject.put("olduser", olduser);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/modificautente");
+        }
+
+        if(("univpm.iot_for_emergency.View.ModificaDati").equals(action)) {
+
+            User = intent.getStringExtra("user");
+
+
+            try {
+                jsonObject.put("user",User);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/modifica");
+        }
 
         if(("univpm.iot_for_emergency.View.Login.Utenti").equals(action)) {
 
@@ -323,7 +369,7 @@ public class InvioDatiService extends Service {
 
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Invio").equals(azione)) {
-                
+
 
             }
 
@@ -350,6 +396,23 @@ public class InvioDatiService extends Service {
                 sendBroadcast(intent);
 
 
+            }
+
+            if(("univpm.iot_for_emergency.View.ModificaDati").equals(azione)) {
+                Intent intent= new Intent("univpm.iot_for_emergency.View.ModificaDati");
+                intent.putExtra("risultato", result);
+                sendBroadcast(intent);
+
+            }
+
+            if(("univpm.iot_for_emergency.View.ModificaDati.Utente").equals(azione)) {
+                    if(result.equals("Utente Esistente sul Server")){
+                        displayToast(result);
+                    }else{
+                        displayToast(result);
+                        Intent intent= new Intent("univpm.iot_for_emergency.View.ModificaDati.Utente");
+                        sendBroadcast(intent);
+                    }
             }
 
             if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(azione)) {

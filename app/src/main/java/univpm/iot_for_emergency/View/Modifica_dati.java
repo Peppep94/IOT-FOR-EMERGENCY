@@ -2,7 +2,10 @@ package univpm.iot_for_emergency.View;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -16,6 +19,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Calendar;
+
+import univpm.iot_for_emergency.View.Funzionali.InvioDatiService;
 import univpm.iot_for_emergency.View.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.ModificaController;
 import univpm.iot_for_emergency.Model.TabUtente;
@@ -43,6 +48,16 @@ public class Modifica_dati extends AppCompatActivity {
     protected int mDay;
     protected String sesso;
     protected String problemi;
+
+    EditText name;
+    EditText cognome;
+    EditText username;
+    EditText password;
+    EditText confPassword;
+    Button bconfmodifica;
+
+
+
     private final static String TAG = ModificaController.class.getSimpleName();
 
 
@@ -71,74 +86,94 @@ public class Modifica_dati extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modifica_dati);
         sessione=new Sessione(this);
-        modificaController=new ModificaController();
         User=sessione.user();
-        tabUtente=modificaController.getDaticontroller(User);
-        final EditText name=(EditText) findViewById(R.id.UNome);
-        final EditText cognome=(EditText) findViewById(R.id.UCognome);
-        final EditText username=(EditText) findViewById(R.id.UUser);
-        final EditText password=(EditText) findViewById(R.id.UPassword);
-        final EditText confPassword=(EditText) findViewById(R.id.ConfermaUPassword);
-        final Button bconfmodifica=(Button) findViewById(R.id.buttonConfModifica);
+
+
+        name=(EditText) findViewById(R.id.UNome);
+        cognome=(EditText) findViewById(R.id.UCognome);
+        username=(EditText) findViewById(R.id.UUser);
+        password=(EditText) findViewById(R.id.UPassword);
+        confPassword=(EditText) findViewById(R.id.ConfermaUPassword);
+        bconfmodifica=(Button) findViewById(R.id.buttonConfModifica);
 
         username.setText(User);
-        name.setText(tabUtente.nome);
-        cognome.setText(tabUtente.cognome);
-        password.setText(tabUtente.password);
-        confPassword.setText(tabUtente.password);
-
-        problemi=(tabUtente.problemi);
-        sesso=(tabUtente.sesso);
-
-        String[] datasezionata=tabUtente.datan.split("/");
 
 
-        mDay= Integer.parseInt(datasezionata[0].trim());
-        mMonth= Integer.parseInt(datasezionata[1])-1;
-        mYear= Integer.parseInt(datasezionata[2].trim());
-        datepicker();
-        spinner();
+        Intent intent=new Intent(this, InvioDatiService.class);
+        intent.setAction("univpm.iot_for_emergency.View.ModificaDati");
+        intent.putExtra("user", User);
+        startService(intent);
+
 
         bconfmodifica.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String data= String.valueOf(new StringBuilder()
-                        .append("  ")
-                        .append(mDay).append("/")
-                        .append(mMonth+1).append("/")
-                        .append(mYear).append(" "));
 
-                      TabUtente controllo;
+                    modificadatiserver();
 
-                if (!username.getText().toString().contentEquals(User)) {
-                    controllo=modificaController.getDaticontroller(username.getText().toString());
-                }else
-                {
-                    controllo=null;
-                }
-                if(String.valueOf(username.getText()).isEmpty() || String.valueOf(password.getText()).isEmpty()){
-                    displayToast("I campi username e password sono obbligatori");
-                }else if (!String.valueOf(password.getText()).equals(String.valueOf(confPassword.getText()))){
-                    displayToast("Le password non corrispondono");
-                }else if (controllo!=null){
-                    displayToast("Username non disponibile");
-                }else{
-                      tabUtente.user=username.getText().toString();
-                      tabUtente.nome=name.getText().toString();
-                      tabUtente.cognome=cognome.getText().toString();
-                      tabUtente.password=password.getText().toString();
-                      tabUtente.datan=data;
-                      tabUtente.problemi=problemi;
-                      tabUtente.sesso=sesso;
-                      tabUtente.save();
-                    sessione.UtenteLoggato(true,String.valueOf(username.getText()));
-                    displayToast("Modifica avvenuta con successo ");
-                    Intent intent = new Intent(Modifica_dati.this, Home.class); //reinderizzo a Home passando il parametro "username"
-                    Modifica_dati.this.startActivity(intent);
                 }
             }
-        });
+        );
 
+    }
+
+    public void modificadatiserver(){
+        String data= String.valueOf(new StringBuilder()
+                .append("  ")
+                .append(mDay).append("-")
+                .append(mMonth+1).append("-")
+                .append(mYear).append(" "));
+
+        User=username.getText().toString();
+
+        boolean controllo= true;
+
+        if (User.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(User).matches()) {
+            username.setError("Inserisci una mail valida");
+            controllo=false;
+        } else {
+            username.setError(null);
+
+        }
+
+        if (password.getText().toString().isEmpty() || password.getText().toString().length() < 4 || password.getText().toString().length() > 10) {
+            password.setError("tra 4 e 10 caratteri");
+            controllo= false;
+        } else {
+            password.setError(null);
+
+        }
+        if (!password.getText().toString().equals(confPassword.getText().toString())){
+            password.setError("Le password non corrispondono!");
+            controllo= false;
+        } else {
+            password.setError(null);
+
+        }
+
+        if(controllo==true){
+
+
+        Intent intent=new Intent(this, InvioDatiService.class);
+        intent.setAction("univpm.iot_for_emergency.View.ModificaDati.Utente");
+        intent.putExtra("nome", name.getText().toString());
+        intent.putExtra("cognome", cognome.getText().toString());
+        intent.putExtra("pass", password.getText().toString());
+        intent.putExtra("user", User);
+        intent.putExtra("sesso", Sesso);
+        intent.putExtra("problemi", Problemi);
+        intent.putExtra("datan", data);
+        intent.putExtra("olduser", sessione.user());
+        startService(intent);
+
+        }
+
+        sessione.UtenteLoggato(true,String.valueOf(username.getText()));
+        /*
+        displayToast("Modifica avvenuta con successo ");
+        Intent intent1 = new Intent(Modifica_dati.this, Home.class); //reinderizzo a Home passando il parametro "username"
+        Modifica_dati.this.startActivity(intent1);
+        */
     }
 
 
@@ -229,6 +264,53 @@ public class Modifica_dati extends AppCompatActivity {
                         .append(mYear).append(" "));
     }
 
+
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            String action=intent.getAction();
+            if(("univpm.iot_for_emergency.View.ModificaDati").equals(action)){
+
+                String risultato=intent.getStringExtra("risultato");
+                String ris[] = risultato.split(",");
+                name.setText(ris[1]);
+                cognome.setText(ris[2]);
+                password.setText(ris[0]);
+                confPassword.setText(ris[0]);
+                problemi=(ris[4]);
+                sesso=(ris[5]);
+                String[] datasezionata=ris[3].split("-");
+                mDay= Integer.parseInt(datasezionata[0].trim());
+                mMonth= Integer.parseInt(datasezionata[1])-1;
+                mYear= Integer.parseInt(datasezionata[2].trim());
+                datepicker();
+                spinner();
+            }
+            if(("univpm.iot_for_emergency.View.ModificaDati.Utente").equals(action)){
+
+                finish();
+            }
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+    }
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("univpm.iot_for_emergency.View.ModificaDati");
+        intentFilter.addAction("univpm.iot_for_emergency.View.ModificaDati.Utente");
+        return intentFilter;
+    }
 
 
 }
