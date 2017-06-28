@@ -46,7 +46,7 @@ public class Mappa  extends ImageView{
         if(quota==155)
             bMap = BitmapFactory.decodeResource(getResources(), R.drawable.q155_misure);
         Bitmap mutableBitmap = bMap.copy(Bitmap.Config.ARGB_8888, true);
-        Bitmap bMap1 = BitmapFactory.decodeResource(getResources(),R.drawable.stickman2);
+        Bitmap bMap1 = BitmapFactory.decodeResource(getResources(),R.drawable.marker);
         Bitmap mutableBitmap1 = bMap1.copy(Bitmap.Config.ARGB_8888, true);
         mutableBitmap=overlay(mutableBitmap,mutableBitmap1,x,y,quota);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT);

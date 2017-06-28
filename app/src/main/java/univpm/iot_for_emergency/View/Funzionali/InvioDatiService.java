@@ -146,6 +146,9 @@ public class InvioDatiService extends Service {
             ArrayList<String> data_app= new ArrayList<String> ();
 
 
+
+
+
             int i=0;
             while (z1 < a1.length) {
                 codice = a1[z1];
@@ -248,12 +251,15 @@ public class InvioDatiService extends Service {
             device=intent.getStringExtra("device");
             currentdate =intent.getStringExtra("data");
 
+            int soglia=sessione.soglia();
+
 
             try {
                 jsonObject.put("umd", hum);
                 jsonObject.put("temp", temp);
                 jsonObject.put("datatime", currentdate);
                 jsonObject.put("address", device);
+                jsonObject.put("soglia",soglia);
 
 
             } catch (JSONException e) {

@@ -41,15 +41,9 @@ public class Login extends AppCompatActivity {
     private String User;
     private String Pass;
     private Sessione sessione;
-    String result;
     String ip;
     String porta;
-    String codice1;
-    String x1;
-    String y1;
-    String quota1;
-    String address1;
-    String data1;
+    String soglia;
     private LoginController loginController;
     private final static String TAG = Login.class.getSimpleName();
     private ProgressDialog progressDialogDB;
@@ -208,15 +202,13 @@ public class Login extends AppCompatActivity {
         Intent intent=new Intent(this, InvioDatiService.class);
         intent.setAction("univpm.iot_for_emergency.View.Login.Punti");
         intent.putExtra("arraypunti", a1);
+        intent.putExtra("soglia", soglia);
         this.startService(intent);
 
 
 
 
         }
-
-
-
 
     private void controlloServer() {
         AssetManager am = getAssets();
@@ -253,10 +245,14 @@ public class Login extends AppCompatActivity {
                 else {
                     cell = s.getCell(0, 1);
                     xx = xx + cell.getContents() + ",";
-                    Log.e("ip", xx);
+
                     cell = s.getCell(1, 1);
                     xx = xx + cell.getContents() + ",";
-                    Log.e("ip e porta", xx);
+
+
+                    cell = s.getCell(2, 1);
+                    xx = xx + cell.getContents() + ",";
+
                 }
 
         int z = 0;
@@ -266,15 +262,12 @@ public class Login extends AppCompatActivity {
             ip = "";
 
         } else {
-            while (z <= a.length / 2) {
-                ip = a[z];
-                porta = a[z + 1];
-                z = z + 2;
 
+                ip = a[0];
+                porta = a[1];
+                soglia= a[2];
+                sessione.DatiSoglia(Integer.parseInt(soglia));
             }
-
-        }
-        //System.out.println(a.length);
 
     }
 
@@ -372,6 +365,7 @@ public class Login extends AppCompatActivity {
         {
             Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home
             Login.this.startActivity(intent);
+            finish();
         }
     }
 

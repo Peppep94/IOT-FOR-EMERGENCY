@@ -28,6 +28,12 @@ public class Sessione {
         editor.commit();
     }
 
+    public void DatiSoglia(int soglia)
+    {
+        editor.putInt("soglia",soglia);
+        editor.commit();
+    }
+
     public boolean loggedin(){
         return log.getBoolean("loggedInmode", false);
     }
@@ -39,6 +45,8 @@ public class Sessione {
     public String porta(){
         return log.getString("porta","null");
     }
+
+    public int soglia(){return log.getInt("soglia", 0);}
 
     public String user(){
         return log.getString("user","null");
