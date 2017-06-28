@@ -112,7 +112,6 @@ public class Login extends AppCompatActivity {
             registerLink.setEnabled(false);
             Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
             sessione.DatiServer("","");
-            //controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
             contatore=contatore+1;
         }else{
             sessione.DatiServer(ip,porta);
@@ -343,7 +342,6 @@ public class Login extends AppCompatActivity {
                     registerLink.setEnabled(false);
                     Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
                     sessione.DatiServer("","");
-                    //controlloPrimoAvvio();  // controlla se la sessione è attiva, nel caso lo fosse reindirizza ad Home
                     contatore=contatore+1;
                 }
             }
@@ -351,7 +349,7 @@ public class Login extends AppCompatActivity {
                 String risultato= intent.getStringExtra("risultato");
                 if(risultato.equals("Utente autenticato!")){
                     sessione.UtenteLoggato(true,User);
-                    Intent intent1 = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
+                    Intent intent1 = new Intent(Login.this, Home.class); //reinderizzo a Home
                     Login.this.startActivity(intent1);
                     finish();
                 }else{
@@ -363,11 +361,19 @@ public class Login extends AppCompatActivity {
                 progressDialogDB.dismiss();
                 contatore=contatore+1;
                 sessione.DatiServer(ip,porta);
-
-
+                controlloPrimoAvvio();
             }
         }
     };
+
+
+    public void controlloPrimoAvvio() {
+        if(sessione.loggedin())
+        {
+            Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home
+            Login.this.startActivity(intent);
+        }
+    }
 
 
 
