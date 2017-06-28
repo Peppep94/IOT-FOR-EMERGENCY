@@ -4,25 +4,24 @@ package univpm.iot_for_emergency.View;
 import uk.co.senab.photoview.PhotoViewAttacher;
 import univpm.iot_for_emergency.Controller.HomeController;
 import univpm.iot_for_emergency.Model.TabPunti;
-import univpm.iot_for_emergency.View.Funzionali.BluetoothLeService;
-import univpm.iot_for_emergency.View.Funzionali.InvioDatiService;
-import univpm.iot_for_emergency.View.Funzionali.Mappa;
-import univpm.iot_for_emergency.View.Funzionali.Sessione;
+import univpm.iot_for_emergency.Controller.Funzionali.BluetoothLeService;
+import univpm.iot_for_emergency.Controller.Funzionali.Mappa;
+import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -35,16 +34,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 import java.text.DateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
-import static android.R.attr.thickness;
 import static android.R.attr.uiOptions;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -56,7 +50,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private Toolbar toolbar;
     private Mappa imageView=null;
     private boolean started=false;
-
+    private ProgressDialog progressDialogDB;
+    private int contatore=0;
 
 
     private static final int MY_PERMISSIONS_REQUEST =1 ;
@@ -71,6 +66,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         setSupportActionBar(toolbar);
         sessione = new Sessione(this);
         imageView = (Mappa) findViewById(R.id.mappa);
+
+        progressDialogDB=new ProgressDialog(Home.this, R.style.AppTheme_Dark);
+        progressDialogDB.setIndeterminate(true);
+        progressDialogDB.setMessage("Scansione Beacon...");
+        progressDialogDB.show();
 
         if (!sessione.loggedin()) {
             loguot();
@@ -266,10 +266,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             HomeController homeController=new HomeController();
 
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server").equals(action)) {
+
+
+                toolbar.setBackgroundColor(Color.RED);
                 String device=intent.getStringExtra("device");
                 String humidity=intent.getStringExtra("hum");
                 String temperature=intent.getStringExtra("temp");
                 String address[]= intent.getStringArrayExtra("address");
+
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
                 String currentDateTimeString=intent.getStringExtra("data");
                 toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
@@ -290,6 +294,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
 
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
+
+                toolbar.setBackgroundColor(Color.parseColor("#009933"));
                 int humidity=(int)intent.getDoubleExtra("hum",1000);
                 int temperature=(int)intent.getDoubleExtra("temp",1000);
                 toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
@@ -305,6 +311,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
 
             if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(action)) {
+                if(contatore==0){
+                    progressDialogDB.dismiss();
+                    contatore++;
+                }
+
                 String device=intent.getStringExtra("device");
                 TabPunti coord=homeController.TrovaCoordQuota(device);
                 imageView.init(toolbar,Integer.parseInt(coord.x),Integer.parseInt(coord.y),Integer.parseInt(coord.quota));

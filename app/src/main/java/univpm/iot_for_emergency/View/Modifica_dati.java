@@ -20,10 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Calendar;
 
-import univpm.iot_for_emergency.View.Funzionali.InvioDatiService;
-import univpm.iot_for_emergency.View.Funzionali.Sessione;
+import univpm.iot_for_emergency.Controller.Funzionali.InvioDatiService;
+import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.ModificaController;
-import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.R;
 
 /**
@@ -39,7 +38,7 @@ public class Modifica_dati extends AppCompatActivity {
 
     private int contatore=0;
     private ModificaController modificaController;
-    private TabUtente tabUtente;
+
     private Sessione sessione;
     protected TextView mDateDisplay;
     protected ImageButton mPickDate;

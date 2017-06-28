@@ -1,5 +1,5 @@
 
-package univpm.iot_for_emergency.View.Funzionali;
+package univpm.iot_for_emergency.Controller.Funzionali;
 
 import java.util.UUID;
 import static java.util.UUID.fromString;

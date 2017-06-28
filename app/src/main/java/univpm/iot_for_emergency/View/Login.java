@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.AssetManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -17,22 +16,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
+
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
-import univpm.iot_for_emergency.Controller.RegistraController;
 import univpm.iot_for_emergency.Model.TabPunti;
-import univpm.iot_for_emergency.Model.TabUtente;
-import univpm.iot_for_emergency.View.Funzionali.InvioDatiService;
-import univpm.iot_for_emergency.View.Funzionali.Sessione;
+import univpm.iot_for_emergency.Controller.Funzionali.InvioDatiService;
+import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.R;
 
@@ -85,7 +79,7 @@ public class Login extends AppCompatActivity {
                     Usertext.setEnabled(false);
                     Passtext.setEnabled(false);
                     registerLink.setEnabled(false);
-                    Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).setDuration(20000).show();
                     sessione.DatiServer("","");
                     contatore=contatore+1;
 
@@ -104,7 +98,7 @@ public class Login extends AppCompatActivity {
             Usertext.setEnabled(false);
             Passtext.setEnabled(false);
             registerLink.setEnabled(false);
-            Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).setDuration(20000).show();
             sessione.DatiServer("","");
             contatore=contatore+1;
         }else{
@@ -308,8 +302,8 @@ public class Login extends AppCompatActivity {
     }
 
     private void LoginGuest(){
-        int id=loginController.countUtcontroller()+1;
-        User="Guest"+id;
+
+        User="Guest";
         sessione.UtenteLoggato(true,User); //avvio la sessione
 
         Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
@@ -333,7 +327,7 @@ public class Login extends AppCompatActivity {
                     Usertext.setEnabled(false);
                     Passtext.setEnabled(false);
                     registerLink.setEnabled(false);
-                    Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(android.R.id.content), "Sei offline", Snackbar.LENGTH_LONG).setDuration(20000).show();
                     sessione.DatiServer("","");
                     contatore=contatore+1;
                 }

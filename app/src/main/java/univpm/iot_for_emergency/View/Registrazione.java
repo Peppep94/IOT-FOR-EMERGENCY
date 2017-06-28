@@ -6,11 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,25 +19,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Calendar;
 import java.util.Date;
 
-import univpm.iot_for_emergency.Controller.RegistraController;
-import univpm.iot_for_emergency.Model.TabUtente;
 import univpm.iot_for_emergency.R;
-import univpm.iot_for_emergency.View.Funzionali.InvioDatiService;
-import univpm.iot_for_emergency.View.Funzionali.Sessione;
+import univpm.iot_for_emergency.Controller.Funzionali.InvioDatiService;
+import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
 
 public class Registrazione extends AppCompatActivity {
 

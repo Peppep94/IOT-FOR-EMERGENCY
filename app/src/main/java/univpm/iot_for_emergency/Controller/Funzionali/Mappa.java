@@ -1,4 +1,4 @@
-package univpm.iot_for_emergency.View.Funzionali;
+package univpm.iot_for_emergency.Controller.Funzionali;
 
 import android.content.Context;
 import android.graphics.Bitmap;

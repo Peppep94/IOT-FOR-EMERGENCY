@@ -10,7 +10,7 @@
     android:id="@+id/contenthome"
     tools:context=".View.Home">
 
-    <univpm.iot_for_emergency.View.Funzionali.Mappa
+    <univpm.iot_for_emergency.Controller.Funzionali.Mappa
         android:id="@+id/mappa"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

@@ -63,12 +63,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".View.Funzionali.BluetoothLeService"
+            android:name=".Controller.Funzionali.BluetoothLeService"
             android:icon="@mipmap/ic_launcher"
             android:label="MyService" />
 
         <receiver
-            android:name=".View.Funzionali.Receiver"
+            android:name=".Controller.Funzionali.Receiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -79,7 +79,7 @@
         </receiver>
 
         <service
-            android:name=".View.Funzionali.InvioDatiService"
+            android:name=".Controller.Funzionali.InvioDatiService"
             android:enabled="true"
             android:exported="false"></service>
     </application>

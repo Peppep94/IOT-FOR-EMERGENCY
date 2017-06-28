@@ -1,4 +1,4 @@
-package univpm.iot_for_emergency.View.Funzionali;
+package univpm.iot_for_emergency.Controller.Funzionali;
 
 import android.annotation.TargetApi;
 import android.app.Service;
@@ -17,25 +17,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
-
-import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.util.Date;
-
-import uk.co.senab.photoview.PhotoViewAttacher;
-import univpm.iot_for_emergency.Controller.HomeController;
-import univpm.iot_for_emergency.Model.TabPunti;
-import univpm.iot_for_emergency.View.Login;
 
 import static android.content.ContentValues.TAG;
 
