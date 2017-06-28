@@ -254,7 +254,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private void loguot(){
         Intent i= new Intent("univpm.iot_for_emergency.View.Funzionali.Stop");
         sendBroadcast(i);
-        sessione.UtenteLoggato(false,null);
+        sessione.UtenteLoggato(false,sessione.user());
+        sessione.UtenteGuest(false,sessione.user());
         finish();
         startActivity(new Intent(univpm.iot_for_emergency.View.Home.this,Login.class));
     }

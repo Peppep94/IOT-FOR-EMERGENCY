@@ -130,10 +130,11 @@ public class BluetoothLeService extends Service {
             mBluetoothDeviceAddress=device.getAddress();
             if (deviceName != null && deviceName.length() > 0) {
                 if (deviceName.contains("SensorTag")) {
-                    Log.e("callback",deviceName);
                     connect();
                     scanLeDevice(false);
                     final Intent intent = new Intent("univpm.iot_for_emergency.View.Funzionali.Trovato");
+                    Sessione sessione=new Sessione(getBaseContext());
+                    intent.putExtra("user",sessione.user());
                     intent.putExtra("device",mBluetoothDeviceAddress);
                     sendBroadcast(intent);
 

@@ -25,7 +25,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import univpm.iot_for_emergency.Controller.HomeController;
@@ -276,10 +278,12 @@ public class InvioDatiService extends Service {
 
             device=intent.getStringExtra("device");
             String user=intent.getStringExtra("user");
+            String currentDate = DateFormat.getDateTimeInstance().format(new Date());
 
             try {
                 jsonObject.put("user", user);
                 jsonObject.put("address", device);
+                jsonObject.put("currentdate",currentDate);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -425,19 +429,24 @@ public class InvioDatiService extends Service {
 
             if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(azione)) {
                 final String risultato=result;
-
+                String username="";
                 if (risultato!=null) {
                     String a1[] = result.split(",");
                     if (a1.length > 1) {
-                        temp = a1[0];
-                        hum = a1[1];
-                        String data = a1[2];
-                        String totaddress[] = new String[a1.length-3];
+                        username=a1[0];
+                        if (username.contains("Guest"))
+                        {
+                            sessione.UtenteGuest(true,username);
+                        }
+                        temp = a1[1];
+                        hum = a1[2];
+                        String data = a1[3];
+                        String totaddress[] = new String[a1.length-4];
                         String addresssend[]=new String[1];
                         addresssend[0]="niente";
-                        for (int i=3;i<a1.length;i++)
+                        for (int i=4;i<a1.length;i++)
                         {
-                            totaddress[i-3]=a1[i];
+                            totaddress[i-4]=a1[i];
                         }
                         final Intent intent = new Intent();
                         if(totaddress.length!=0){

@@ -304,7 +304,7 @@ public class Login extends AppCompatActivity {
     private void LoginGuest(){
 
         User="Guest";
-        sessione.UtenteLoggato(true,User); //avvio la sessione
+        sessione.UtenteGuest(true,User); //avvio la sessione
 
         Intent intent = new Intent(Login.this, Home.class); //reinderizzo a Home passando il parametro "username"
         intent.putExtra("user", User);

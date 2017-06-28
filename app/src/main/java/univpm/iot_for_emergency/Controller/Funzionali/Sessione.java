@@ -51,4 +51,12 @@ public class Sessione {
     public String user(){
         return log.getString("user","null");
     }
+
+    public void UtenteGuest(boolean loggedin,String user){
+        editor.putBoolean("loggedInmode",loggedin);
+        editor.putString("user",user);
+        editor.commit();
+    }
+
+
 }
