@@ -138,15 +138,12 @@ public class Modifica_dati extends AppCompatActivity {
         if (password.getText().toString().isEmpty() || password.getText().toString().length() < 4 || password.getText().toString().length() > 10) {
             password.setError("tra 4 e 10 caratteri");
             controllo= false;
-        } else {
-            password.setError(null);
-
-        }
-        if (!password.getText().toString().equals(confPassword.getText().toString())){
+        } else if (!password.getText().toString().equals(confPassword.getText().toString())){
             password.setError("Le password non corrispondono!");
+            confPassword.setError("Le password non corrispondono!");
             controllo= false;
-        } else {
-            password.setError(null);
+        }else {
+            confPassword.setError(null);
 
         }
 

@@ -182,17 +182,42 @@ public class Registrazione extends AppCompatActivity {
                 .append(mYear).append(" "));
         DataN=DataN.replace("/","-");
 
-        Intent intent=new Intent(this, InvioDatiService.class);
-        intent.setAction("univpm.iot_for_emergency.View.Registrazione");
-        intent.putExtra("nome", Nome);
-        intent.putExtra("cognome", Cognome);
-        intent.putExtra("pass", Pass);
-        intent.putExtra("user", User);
-        intent.putExtra("sesso", Sesso);
-        intent.putExtra("problemi", Problemi);
-        intent.putExtra("datan", DataN);
-        intent.putExtra("confpass", ConfPass);
-        startService(intent);
+        boolean controllo= true;
+
+        if (User.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(User).matches()) {
+            username.setError("Inserisci una mail valida");
+            controllo=false;
+        } else {
+            username.setError(null);
+
+        }
+
+        if (Pass.isEmpty() || Pass.length() < 4 || Pass.length() > 10) {
+            password.setError("tra 4 e 10 caratteri");
+            controllo= false;
+        } else if (!password.getText().toString().equals(confPassword.getText().toString())){
+                password.setError("Le password non corrispondono!");
+                confPassword.setError("Le password non corrispondono!");
+                controllo= false;
+                 }else {
+                     confPassword.setError(null);
+
+        }
+
+
+        if(controllo==true) {
+            Intent intent = new Intent(this, InvioDatiService.class);
+            intent.setAction("univpm.iot_for_emergency.View.Registrazione");
+            intent.putExtra("nome", Nome);
+            intent.putExtra("cognome", Cognome);
+            intent.putExtra("pass", Pass);
+            intent.putExtra("user", User);
+            intent.putExtra("sesso", Sesso);
+            intent.putExtra("problemi", Problemi);
+            intent.putExtra("datan", DataN);
+            intent.putExtra("confpass", ConfPass);
+            startService(intent);
+        }
 
 
     }

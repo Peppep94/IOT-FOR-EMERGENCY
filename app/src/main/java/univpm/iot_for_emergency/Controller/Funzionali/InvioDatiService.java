@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -29,7 +30,30 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import jxl.Cell;
+import jxl.CellView;
+import jxl.Hyperlink;
+import jxl.Image;
+import jxl.LabelCell;
+import jxl.Range;
+import jxl.Sheet;
+import jxl.SheetSettings;
+import jxl.Workbook;
+import jxl.format.CellFormat;
+import jxl.format.PageOrientation;
+import jxl.format.PaperSize;
+import jxl.read.biff.BiffException;
+import jxl.read.biff.File;
+import jxl.write.Label;
+import jxl.write.WritableCell;
+import jxl.write.WritableHyperlink;
+import jxl.write.WritableImage;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
 import univpm.iot_for_emergency.Controller.HomeController;
 import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.Model.TabPunti;
@@ -38,10 +62,10 @@ import univpm.iot_for_emergency.R;
 import univpm.iot_for_emergency.View.Login;
 
 public class InvioDatiService extends Service {
-    private  String Nome;
+    private String Nome;
     private String Cognome;
     private String User ;
-    private  String Pass ;
+    private String Pass ;
     private String Sesso;
     private String Problemi;
     private String DataN;
@@ -148,10 +172,6 @@ public class InvioDatiService extends Service {
             ArrayList<String> address_app= new ArrayList<String> ();
             ArrayList<String> data_app= new ArrayList<String> ();
 
-
-
-
-
             int i=0;
             while (z1 < a1.length) {
                 codice = a1[z1];
@@ -189,6 +209,7 @@ public class InvioDatiService extends Service {
             }
                 //Log.e("data",data);
             }
+
                 try {
                     jsonObject.put("codice", new JSONArray(cod_app));
                     jsonObject.put("x", new JSONArray(x_app));
@@ -330,7 +351,7 @@ public class InvioDatiService extends Service {
 
             BufferedReader bf = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String value = bf.readLine();
-            System.out.println("Output:"+value);
+            //System.out.println("Output:"+value);
             result= value;
             risposta = httpURLConnection.getResponseCode();
 
@@ -386,10 +407,47 @@ public class InvioDatiService extends Service {
             }
 
             if(("univpm.iot_for_emergency.View.Login.Punti").equals(azione)) {
+                String dati[]=result.split(",");
+                LoginController aggiornapunti=new LoginController();
+
+                if(dati.length>1)
+                {
+                    int i=0;
+                    while (i<dati.length-1)
+                    {
+                        aggiornapunti.AggiornadatiController(dati[i],dati[i+1],dati[i+2],dati[i+3],dati[i+4],dati[i+5]);
+
+                        AssetManager am = getAssets();
+                        InputStream is = null;
+
+                        try {
+                            is = am.open("Dati.xls");
+                        } catch (IOException e) {
+
+                            e.printStackTrace();
+                        }
+                        Workbook wb = null;
+                        try {
+                            wb = Workbook.getWorkbook(is);
+                        } catch (IOException e) {
+
+
+                            e.printStackTrace();
+                        } catch (BiffException e) {
+
+
+                            e.printStackTrace();
+                        }
+
+                        Sheet sheet = wb.getSheet(0);
+                        Log.e("righe", String.valueOf(sheet.findCell(dati[i]).getRow()));
+                        i=i+6;
+                    }
+                }
 
                 int c=0;
                 if(c==0){
-                    if(("online").equals(result)){
+                    if(result.contains("online")){
                         c=c+1;
                         Intent intent= new Intent("univpm.iot_for_emergency.View.Login.Punti");
                         sendBroadcast(intent);

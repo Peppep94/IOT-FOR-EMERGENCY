@@ -46,6 +46,20 @@ public class TabPunti extends SugarRecord{
 
     }
 
+
+    public void Aggiornadati(String codice, String x, String y, String quota,String address,String data)
+    {
+        List<TabPunti> tabPunti = TabPunti.find(TabPunti.class,"codice=?",codice);
+        TabPunti punti=tabPunti.get(0);
+        punti.codice=codice;
+        punti.address=address;
+        punti.x=x;
+        punti.y=y;
+        punti.quota=quota;
+        punti.data=data;
+        punti.save();
+    }
+
     public TabPunti TrovaCoordQuotaModel(String address)
     {
         List<TabPunti> tabPunti = TabPunti.find(TabPunti.class,"address=?",address);

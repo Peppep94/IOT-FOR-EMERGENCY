@@ -14,5 +14,9 @@ public class LoginController {
         return tabPunti.SalvaPunti(codice,x,y,quota,address,data);
     }
 
+    public void AggiornadatiController(String codice, String x, String y, String quota,String address,String data){
+        tabPunti.Aggiornadati(codice,x,y,quota,address,data);
+    }
+
 }
 
