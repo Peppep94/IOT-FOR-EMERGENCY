@@ -16,12 +16,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -29,6 +32,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -90,6 +94,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         mBluetoothAdapter = bluetoothManager.getAdapter();
 
 
+
+
         // Controlla se il Bluetooth è supportato.
         if (mBluetoothAdapter == null) {
             Toast.makeText(this,
@@ -100,10 +106,16 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
 
         requestPermission();
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            displayPromptForEnablingGPS();        }
+
 
         Intent i= new Intent(this, BluetoothLeService.class);
 
-        if(mBluetoothAdapter.isEnabled()) {
+        if(mBluetoothAdapter.isEnabled() &&  manager.isProviderEnabled( LocationManager.GPS_PROVIDER )) {
             if(started==false) {
                 this.startService(i);
                 started=true;
@@ -153,13 +165,39 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
 
         if (requestCode== RQS_ENABLE_BLUETOOTH &&resultCode == RESULT_OK) {
+
+            final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+            if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                displayPromptForEnablingGPS();        }else {
             Intent i= new Intent(this, BluetoothLeService.class);
             if(started==false) {
               this.startService(i);
                 started=true;
             }
+                }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    public void displayPromptForEnablingGPS()
+    {
+
+        final AlertDialog.Builder builder =  new AlertDialog.Builder(Home.this,R.style.AppTheme_Dark_Dialog);
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "Abilita il gps poi riapri l'app";
+
+        builder.setMessage(message)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                startActivity(new Intent(action));
+                                d.dismiss();
+                            }
+                        })
+                .setCancelable(false);
+        builder.create().show();
     }
 
 
@@ -189,7 +227,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         // BEGIN_INCLUDE(onRequestPermissionsResult)
         if (requestCode == MY_PERMISSIONS_REQUEST) {
-            // Request for camera permission.
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             }
             else {
