@@ -407,7 +407,11 @@ public class InvioDatiService extends Service {
             }
 
             if(("univpm.iot_for_emergency.View.Login.Punti").equals(azione)) {
-                String dati[]=result.split(",");
+                final String controllo=result;
+                if (controllo!=null){
+                    String dati[]=result.split(",");
+
+
                 LoginController aggiornapunti=new LoginController();
 
                 if(dati.length>1)
@@ -453,7 +457,7 @@ public class InvioDatiService extends Service {
                         sendBroadcast(intent);
                     }
                 }
-
+                }
 
 
 
