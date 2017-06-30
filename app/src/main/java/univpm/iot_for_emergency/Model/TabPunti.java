@@ -4,7 +4,12 @@ import android.util.Log;
 
 import com.orm.SugarRecord;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by MacBookPro on 06/06/17.
@@ -58,6 +63,35 @@ public class TabPunti extends SugarRecord{
         punti.quota=quota;
         punti.data=data;
         punti.save();
+    }
+
+
+    public void AggiornaoldDatabase(String codice, String x, String y, String quota,String address,String data){
+
+        List<TabPunti> tabPunti = TabPunti.find(TabPunti.class,"codice=?",codice);
+        TabPunti punti=tabPunti.get(0);
+        DateFormat format = new SimpleDateFormat("dd/MM/yy", Locale.ITALIAN);
+        Date dataold = null;
+        Date datanew= null;
+
+        try {
+            dataold = format.parse(punti.data);
+            datanew= format.parse(data);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if(datanew.after(dataold))
+        {
+            punti.codice=codice;
+            punti.address=address;
+            punti.x=x;
+            punti.y=y;
+            punti.quota=quota;
+            punti.data=data;
+            punti.save();
+        }
+
     }
 
     public TabPunti TrovaCoordQuotaModel(String address)

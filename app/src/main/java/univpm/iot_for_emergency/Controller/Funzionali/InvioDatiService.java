@@ -127,7 +127,7 @@ public class InvioDatiService extends Service {
                 e.printStackTrace();
             }
 
-            new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/modificautente");
+            new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/modificautente");
         }
 
         if(("univpm.iot_for_emergency.View.ModificaDati").equals(action)) {
@@ -142,7 +142,7 @@ public class InvioDatiService extends Service {
                 e.printStackTrace();
             }
 
-            new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/modifica");
+            new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/modifica");
         }
 
         if(("univpm.iot_for_emergency.View.Login.Utenti").equals(action)) {
@@ -157,13 +157,14 @@ public class InvioDatiService extends Service {
                 e.printStackTrace();
             }
 
-                new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/db");
+                new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/db");
         }
 
         if(("univpm.iot_for_emergency.View.Login.Punti").equals(action)) {
 
             int z1=0;
             LoginController salvapunti=new LoginController();
+
             String a1[]=intent.getStringArrayExtra("arraypunti");
             ArrayList<String> cod_app= new ArrayList<String> ();
             ArrayList<String> x_app= new ArrayList<String> ();
@@ -193,7 +194,9 @@ public class InvioDatiService extends Service {
                 data.trim();
                 data_app.add(data);
 
-                int h=salvapunti.SalvaPuntiController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
+                salvapunti.AggiornaoldDatabaseController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
+
+                /*int h=salvapunti.SalvaPuntiController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
                 switch (h) {
                     case 0:
                         displayToast("Punti x,y mancanti!");
@@ -204,9 +207,10 @@ public class InvioDatiService extends Service {
                     case 2:
                         Log.e("Codice:", a1[z1] + " inserito!");
 
-                        z1 = z1 + 6;
-                        i=i+1;
-            }
+
+            }*/
+                z1 = z1 + 6;
+                i=i+1;
                 //Log.e("data",data);
             }
 
@@ -223,7 +227,7 @@ public class InvioDatiService extends Service {
                     e.printStackTrace();
                 }
 
-                new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/punti");
+                new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/punti");
 
 
 
@@ -264,7 +268,7 @@ public class InvioDatiService extends Service {
             } else if (User.isEmpty() || Pass.isEmpty()) {
                 displayToast("User e password non possono essere vuoti!");
             } else {
-                new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti");
+                new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati");
             }
         }
 
@@ -291,7 +295,7 @@ public class InvioDatiService extends Service {
                 e.printStackTrace();
             }
 
-            new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/beacon");
+            new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/beacon");
         }
 
 
@@ -309,7 +313,7 @@ public class InvioDatiService extends Service {
                 e.printStackTrace();
             }
 
-            new send().execute("http://" + ip + ":" + porta + "/MyFirsRestService/utenti/beacon2");
+            new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/beacon2");
 
         }
 
@@ -420,31 +424,6 @@ public class InvioDatiService extends Service {
                     while (i<dati.length-1)
                     {
                         aggiornapunti.AggiornadatiController(dati[i],dati[i+1],dati[i+2],dati[i+3],dati[i+4],dati[i+5]);
-
-                        AssetManager am = getAssets();
-                        InputStream is = null;
-
-                        try {
-                            is = am.open("Dati.xls");
-                        } catch (IOException e) {
-
-                            e.printStackTrace();
-                        }
-                        Workbook wb = null;
-                        try {
-                            wb = Workbook.getWorkbook(is);
-                        } catch (IOException e) {
-
-
-                            e.printStackTrace();
-                        } catch (BiffException e) {
-
-
-                            e.printStackTrace();
-                        }
-
-                        Sheet sheet = wb.getSheet(0);
-                        Log.e("righe", String.valueOf(sheet.findCell(dati[i]).getRow()));
                         i=i+6;
                     }
                 }

@@ -151,7 +151,7 @@ public class Login extends AppCompatActivity {
 
 
     private void LetturaMappa() {
-        TabPunti.deleteAll(TabPunti.class);
+        //TabPunti.deleteAll(TabPunti.class);
         AssetManager am1 = getAssets();
         InputStream is1 = null;
 
