@@ -17,12 +17,21 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
 
 import static android.content.ContentValues.TAG;
 
@@ -37,7 +46,8 @@ public class BluetoothLeService extends Service {
     private BluetoothAdapter mBluetoothAdapter;
     private Handler mHandler;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 10000;
+    private static long SCAN_PERIOD = 10000;
+    private static long PAUSE_PERIOD = 5000;
 
     private int mConnectionState = STATE_DISCONNECTED;
     private static final int STATE_DISCONNECTED = 0;
@@ -61,6 +71,7 @@ public class BluetoothLeService extends Service {
         Log.i("ScanService", "sono partito");
         super.onCreate();
         getBluetoothAdapterAndLeScanner();
+        LetturaPeriodo();
         mHandler = new Handler();
         mBluetoothDeviceAddress="";
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
@@ -94,16 +105,17 @@ public class BluetoothLeService extends Service {
                 @Override
                 public void run() {
                     mBluetoothLeScanner.stopScan(scanCallback);
-                    final Intent intent1 = new Intent("action");
-                    intent1.putExtra("nome","pausa");
+                    final Intent intent1 = new Intent("univpm.iot_for_emergency.View.Funzionali.Scaduto");
                     sendBroadcast(intent1);
                     if (!logout) {
                         mHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
+                                final Intent intent1 = new Intent("univpm.iot_for_emergency.View.Funzionali.Scansione");
+                                sendBroadcast(intent1);
                                 scanLeDevice(true);
                             }
-                        }, 5000);
+                        }, PAUSE_PERIOD);
                     }
                     Log.e("ble scanner","Tempo scaduto");
                 }
@@ -128,19 +140,21 @@ public class BluetoothLeService extends Service {
             BluetoothDevice device = result.getDevice();
             final String deviceName = device.getName();
             mBluetoothDeviceAddress=device.getAddress();
-            if (deviceName != null && deviceName.length() > 0) {
-                if (deviceName.contains("SensorTag")) {
-                    connect();
-                    scanLeDevice(false);
-                    final Intent intent = new Intent("univpm.iot_for_emergency.View.Funzionali.Trovato");
-                    Sessione sessione=new Sessione(getBaseContext());
-                    intent.putExtra("user",sessione.user());
-                    intent.putExtra("device",mBluetoothDeviceAddress);
-                    sendBroadcast(intent);
+            if(!logout) {
+                if (deviceName != null && deviceName.length() > 0) {
+                    if (deviceName.contains("SensorTag")) {
+                        connect();
+                        scanLeDevice(false);
+                        final Intent intent = new Intent("univpm.iot_for_emergency.View.Funzionali.Trovato");
+                        Sessione sessione = new Sessione(getBaseContext());
+                        intent.putExtra("user", sessione.user());
+                        intent.putExtra("device", mBluetoothDeviceAddress);
+                        sendBroadcast(intent);
 
+                    }
+                } else {
+                    Log.e("Errore", String.valueOf(callbackType));
                 }
-            } else {
-                Log.e("Errore", String.valueOf(callbackType));
             }
         }
     };
@@ -176,6 +190,7 @@ public class BluetoothLeService extends Service {
         /*Metodo che viene richiamato quando cambia lo stato della connessione (da non connesso passo a connesso e viceversa) */
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            if(!logout){
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mConnectionState = STATE_CONNECTED;
                 mBluetoothDeviceAddress=gatt.getDevice().getAddress();
@@ -190,41 +205,47 @@ public class BluetoothLeService extends Service {
                 //unregisterReceiver(mGattUpdateReceiver);
             }
             gatt.discoverServices();
+            }
         }
 
 
         /*Metodo che viene richiamato una volta che sono stati scoperti i servizi offerti dal dispositivo */
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            if(!logout) {
             /* Mi associo al service che mi interessa*/
-            BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
+                BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
 
             /* Mi associo ala caratteristica che mi interessa*/
-            BluetoothGattCharacteristic enableHum = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_CONF);
+                BluetoothGattCharacteristic enableHum = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_CONF);
 
             /*Assegno alla caratteristica desiderata il valore che accende il sensore*/
-            enableHum.setValue(ENABLE_SENSOR);
+                enableHum.setValue(ENABLE_SENSOR);
 
             /*Invio il dato al sensore*/
-            gatt.writeCharacteristic(enableHum);
+                gatt.writeCharacteristic(enableHum);
+            }
 
         }
 
         /*Metodo che viene richiamato una volta che sono stati iviati dati al dispositivo */
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status){
-            BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
+            if(!logout) {
+                BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
 
-            BluetoothGattCharacteristic humidityCharacteristic = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_DATA);
+                BluetoothGattCharacteristic humidityCharacteristic = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_DATA);
 
             /*richiedo di leggere il valore della caratteristica*/
-            gatt.readCharacteristic(humidityCharacteristic);
+                gatt.readCharacteristic(humidityCharacteristic);
+            }
 
         }
         /*Metodo che viene richiamato una volta che sono stati richiesti i dati al dispositivo*/
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            if(!logout){
             /*Controllo se il valore è uguale a 0, se è così vuol dire che abbiamo preso il valore prima che il sensore si accendesse quindi provo a leggere di nuovo */
             byte []value=characteristic.getValue();
             int t = shortUnsignedAtOffset(value, 0);
@@ -234,6 +255,8 @@ public class BluetoothLeService extends Service {
             }else {
                 /*se il valore ricevuto è diverso da 0 abbiamo letto i dati e li inviamo alla home */
                 broadcastUpdate("univpm.iot_for_emergency.View.Funzionali.Ricevuti",characteristic);
+            }
+
             }
         }
 
@@ -313,6 +336,60 @@ public class BluetoothLeService extends Service {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Stop");
         return intentFilter;
+    }
+
+    private void LetturaPeriodo() {
+        AssetManager am = getAssets();
+        InputStream is = null;
+
+        try {
+            is = am.open("Periodo Scansione.xls");
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+        Workbook wb = null;
+        try {
+            wb = Workbook.getWorkbook(is);
+        } catch (IOException e) {
+
+
+            e.printStackTrace();
+        } catch (BiffException e) {
+
+
+            e.printStackTrace();
+        }
+        Sheet s = wb.getSheet(0);
+
+
+
+        String xx = "";
+        Cell cell=null;
+        if(s.getRows()<2)
+        {
+            xx=", ,";
+        }
+        else {
+            cell = s.getCell(0, 1);
+            xx = xx + cell.getContents() + ",";
+
+            cell = s.getCell(1, 1);
+            xx = xx + cell.getContents() + ",";
+
+        }
+
+        int z = 0;
+        String a[] = xx.split(",");
+        if (a.length == 1 || a.length == 0) {
+        } else {
+
+            SCAN_PERIOD = Long.parseLong(a[0]);
+            PAUSE_PERIOD = Long.parseLong(a[1]);
+        }
+
+
+
     }
 
     public void displayToast(String message){

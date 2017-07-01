@@ -11,7 +11,6 @@ import univpm.iot_for_emergency.R;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
@@ -38,6 +37,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.text.DateFormat;
 import java.util.Date;
@@ -54,7 +56,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private Toolbar toolbar;
     private Mappa imageView=null;
     private boolean started=false;
-    private ProgressDialog progressDialogDB;
+    private TextView scansione;
+    private ProgressBar progressBar;
     private int contatore=0;
 
 
@@ -70,11 +73,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         setSupportActionBar(toolbar);
         sessione = new Sessione(this);
         imageView = (Mappa) findViewById(R.id.mappa);
-
-        progressDialogDB=new ProgressDialog(Home.this, R.style.AppTheme_Dark);
-        progressDialogDB.setIndeterminate(true);
-        progressDialogDB.setMessage("Scansione Beacon...");
-        progressDialogDB.show();
+        progressBar=(ProgressBar) findViewById(R.id.progressBar);
+        scansione=(TextView) findViewById(R.id.scansione);
+        progressBar.setIndeterminate(true);
 
         if (!sessione.loggedin()) {
             loguot();
@@ -304,8 +305,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             HomeController homeController=new HomeController();
 
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server").equals(action)) {
-
-
                 toolbar.setBackgroundColor(Color.RED);
                 String device=intent.getStringExtra("device");
                 String humidity=intent.getStringExtra("hum");
@@ -329,8 +328,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 });
 
             }
-
-
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
 
                 toolbar.setBackgroundColor(Color.parseColor("#009933"));
@@ -350,10 +347,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
             if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(action)) {
                 if(contatore==0){
-                    progressDialogDB.dismiss();
+                    scansione.setVisibility(View.INVISIBLE);
                     contatore++;
                 }
-
                 String device=intent.getStringExtra("device");
                 TabPunti coord=homeController.TrovaCoordQuota(device);
                 imageView.init(toolbar,Integer.parseInt(coord.x),Integer.parseInt(coord.y),Integer.parseInt(coord.quota));
@@ -367,6 +363,19 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                     }
                 });
             }
+            if(("univpm.iot_for_emergency.View.Funzionali.Scaduto").equals(action)) {
+                if(contatore==0){
+                    scansione.setText("Beacon non trovato");
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
+            }
+            if(("univpm.iot_for_emergency.View.Funzionali.Scansione").equals(action)) {
+                if(contatore==0){
+                    scansione.setText("Scansione Beacon...");
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+            }
+
         }
     };
 
@@ -378,6 +387,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server");
         intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Connesso");
         intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Trovato");
+        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Scaduto");
+        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Scansione");
         return intentFilter;
     }
 

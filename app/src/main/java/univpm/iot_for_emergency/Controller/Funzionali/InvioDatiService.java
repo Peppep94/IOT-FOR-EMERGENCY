@@ -98,8 +98,6 @@ public class InvioDatiService extends Service {
         ip=sessione.ip();
         porta=sessione.porta();
 
-
-
         if(("univpm.iot_for_emergency.View.ModificaDati.Utente").equals(action)) {
 
 
