@@ -75,6 +75,8 @@
                 <action android:name="univpm.iot_for_emergency.View.Funzionali.Ricevuti" />
                 <action android:name="univpm.iot_for_emergency.View.Registrazione"/>
                 <action android:name="univpm.iot_for_emergency.View.Funzionali.Trovato"/>
+                <action android:name="univpm.iot_for_emergency.View.Funzionali.Stop"/>
+                <action android:name="univpm.iot_for_emergency.View.Funzionali.Scaduto"/>
             </intent-filter>
         </receiver>
 

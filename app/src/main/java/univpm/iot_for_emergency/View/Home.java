@@ -195,6 +195,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                             public void onClick(DialogInterface d, int id) {
                                 startActivity(new Intent(action));
                                 d.dismiss();
+                                finish();
                             }
                         })
                 .setCancelable(false);

@@ -3,6 +3,8 @@ package univpm.iot_for_emergency.Controller.Funzionali;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -10,20 +12,35 @@ import java.util.Date;
 import univpm.iot_for_emergency.Controller.HomeController;
 
 public class Receiver extends BroadcastReceiver {
-    private  String Nome;
-    private String Cognome;
-    private String User ;
-    private  String Pass ;
-    private String Sesso;
-    private String Problemi;
-    private String DataN;
-    private String ConfPass;
     private Sessione sessione;
+    private boolean logout=false;
+    private Handler mHandler;
+    private Context ReceiverContext;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
         sessione=new Sessione(context);
+        mHandler=new Handler();
+        ReceiverContext=context;
+
+
+            if(("univpm.iot_for_emergency.View.Funzionali.Stop").equals(action)){
+                logout=true;
+            }
+
+            if(("univpm.iot_for_emergency.View.Funzionali.Scaduto").equals(action)){
+                int stopperiod = intent.getIntExtra("stopperiod",5000);
+                if (!logout) {
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intentservice=new Intent(ReceiverContext, BluetoothLeService.class);
+                            ReceiverContext.startService(intentservice);
+                        }
+                    }, stopperiod);
+                }
+            }
 
 
             if(("univpm.iot_for_emergency.View.Funzionali.Trovato").equals(action)){

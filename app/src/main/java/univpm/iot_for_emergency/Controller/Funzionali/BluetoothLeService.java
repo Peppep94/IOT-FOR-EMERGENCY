@@ -46,8 +46,8 @@ public class BluetoothLeService extends Service {
     private BluetoothAdapter mBluetoothAdapter;
     private Handler mHandler;
     // Stops scanning after 10 seconds.
-    private static long SCAN_PERIOD = 10000;
-    private static long PAUSE_PERIOD = 5000;
+    private static int SCAN_PERIOD = 10000;
+    private static int PAUSE_PERIOD = 5000;
 
     private int mConnectionState = STATE_DISCONNECTED;
     private static final int STATE_DISCONNECTED = 0;
@@ -55,7 +55,7 @@ public class BluetoothLeService extends Service {
     private static final int STATE_CONNECTED = 2;
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
-    private boolean logout;
+    private boolean logout=false;
     private String finaladdress;
     private static BluetoothGatt finalgatt;
 
@@ -68,13 +68,11 @@ public class BluetoothLeService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i("ScanService", "sono partito");
         super.onCreate();
         getBluetoothAdapterAndLeScanner();
         LetturaPeriodo();
         mHandler = new Handler();
         mBluetoothDeviceAddress="";
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         logout=false;
     }
 
@@ -88,6 +86,8 @@ public class BluetoothLeService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         logout=false;
+        final Intent intent1 = new Intent("univpm.iot_for_emergency.View.Funzionali.Scansione");
+        sendBroadcast(intent1);
         scanLeDevice(true);
         return Service.START_NOT_STICKY;
     }
@@ -99,31 +99,17 @@ public class BluetoothLeService extends Service {
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
-            Log.i("ScanService", "scanledevice dentro");
             // Lo scan si ferma dopo un tempo predefinito.
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     mBluetoothLeScanner.stopScan(scanCallback);
                     final Intent intent1 = new Intent("univpm.iot_for_emergency.View.Funzionali.Scaduto");
+                    intent1.putExtra("stopperiod",PAUSE_PERIOD);
                     sendBroadcast(intent1);
-                    if (!logout) {
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                final Intent intent1 = new Intent("univpm.iot_for_emergency.View.Funzionali.Scansione");
-                                sendBroadcast(intent1);
-                                scanLeDevice(true);
-                            }
-                        }, PAUSE_PERIOD);
-                    }
-                    Log.e("ble scanner","Tempo scaduto");
                 }
             }, SCAN_PERIOD);
             mBluetoothLeScanner.startScan(scanCallback);
-            final Intent intent1 = new Intent("action");
-            intent1.putExtra("nome","scanning");
-            sendBroadcast(intent1);
         } else {
             mBluetoothLeScanner.stopScan(scanCallback);
         }
@@ -134,8 +120,6 @@ public class BluetoothLeService extends Service {
     private ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
-            Log.i("ScanService", "callback dentro");
-            Log.e("Errore", String.valueOf(callbackType));
             super.onScanResult(callbackType, result);
             BluetoothDevice device = result.getDevice();
             final String deviceName = device.getName();
@@ -190,19 +174,16 @@ public class BluetoothLeService extends Service {
         /*Metodo che viene richiamato quando cambia lo stato della connessione (da non connesso passo a connesso e viceversa) */
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Log.e(TAG, String.valueOf(logout));
             if(!logout){
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mConnectionState = STATE_CONNECTED;
                 mBluetoothDeviceAddress=gatt.getDevice().getAddress();
                 finaladdress=gatt.getDevice().getAddress();
                 broadcasUpdate("univpm.iot_for_emergency.View.Funzionali.Connesso",mBluetoothDeviceAddress);
-                Log.i(TAG, "Connected to GATT server.");
-                Log.i(TAG, "Attempting to start service discovery:" + finalgatt.discoverServices());
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 mConnectionState = STATE_DISCONNECTED;
-                Log.i(TAG, "Disconnected from GATT server.");
-                //unregisterReceiver(mGattUpdateReceiver);
             }
             gatt.discoverServices();
             }
@@ -281,8 +262,8 @@ public class BluetoothLeService extends Service {
         if(!disconnect()){
             disconnect();
         }
-        Log.w(TAG, "BluetoothGatt "+mBluetoothGatt);
         close();
+        stopSelf();
 
     }
 
@@ -320,23 +301,6 @@ public class BluetoothLeService extends Service {
     }
 
 
-    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, Intent intent) {
-            final String action = intent.getAction();
-
-            if (action.equals("univpm.iot_for_emergency.View.Funzionali.Stop")) {logout=true;}
-
-        }
-    };
-
-
-
-    private static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("univpm.iot_for_emergency.View.Funzionali.Stop");
-        return intentFilter;
-    }
 
     private void LetturaPeriodo() {
         AssetManager am = getAssets();
@@ -384,17 +348,16 @@ public class BluetoothLeService extends Service {
         if (a.length == 1 || a.length == 0) {
         } else {
 
-            SCAN_PERIOD = Long.parseLong(a[0]);
-            PAUSE_PERIOD = Long.parseLong(a[1]);
+            SCAN_PERIOD = Integer.parseInt(a[0]);
+            PAUSE_PERIOD = Integer.parseInt(a[1]);
         }
 
 
 
     }
 
-    public void displayToast(String message){
-        Toast.makeText(BluetoothLeService.this, message, Toast.LENGTH_SHORT).show();
-    }
+
+
 
 
 }

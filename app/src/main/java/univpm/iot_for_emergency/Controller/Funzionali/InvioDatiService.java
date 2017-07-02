@@ -59,6 +59,7 @@ import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.Model.TabPunti;
 
 import univpm.iot_for_emergency.R;
+import univpm.iot_for_emergency.View.Home;
 import univpm.iot_for_emergency.View.Login;
 
 public class InvioDatiService extends Service {
@@ -172,6 +173,8 @@ public class InvioDatiService extends Service {
             ArrayList<String> data_app= new ArrayList<String> ();
 
             int i=0;
+            int numPunti=salvapunti.contaPuntiController();
+
             while (z1 < a1.length) {
                 codice = a1[z1];
                 codice.trim();
@@ -192,9 +195,9 @@ public class InvioDatiService extends Service {
                 data.trim();
                 data_app.add(data);
 
-                salvapunti.AggiornaoldDatabaseController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
 
-                /*int h=salvapunti.SalvaPuntiController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
+                if(numPunti==0){
+                    int h=salvapunti.SalvaPuntiController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
                 switch (h) {
                     case 0:
                         displayToast("Punti x,y mancanti!");
@@ -205,8 +208,11 @@ public class InvioDatiService extends Service {
                     case 2:
                         Log.e("Codice:", a1[z1] + " inserito!");
 
+                        }
+                }else {
+                    salvapunti.AggiornaoldDatabaseController(a1[z1], a1[z1 + 1], a1[z1 + 2], a1[z1 + 3], a1[z1 + 4], a1[z1 + 5]);
+                }
 
-            }*/
                 z1 = z1 + 6;
                 i=i+1;
                 //Log.e("data",data);
@@ -517,7 +523,9 @@ public class InvioDatiService extends Service {
                             intent.setAction("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server");
 
                             Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                            Intent i=new Intent(getBaseContext(),Login.class);
+                            Intent i=new Intent(getBaseContext(),Home.class);
+                            i.setAction("univpm.iot_for_emergency.View.Funzionali.Notifica");
+                            i.putExtra("devicenotifica",device);
                             PendingIntent pi= PendingIntent.getActivity(getBaseContext(), 0, i, 0);
                             NotificationCompat.Builder n  = new NotificationCompat.Builder(getBaseContext())
                                     .setContentTitle("C'è un pericolo!!")

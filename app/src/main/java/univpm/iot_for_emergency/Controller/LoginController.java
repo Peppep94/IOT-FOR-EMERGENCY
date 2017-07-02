@@ -22,5 +22,9 @@ public class LoginController {
         tabPunti.AggiornaoldDatabase(codice,x,y,quota,address,data);
     }
 
+    public int contaPuntiController() {
+        return tabPunti.contaPunti();
+    }
+
 }
 

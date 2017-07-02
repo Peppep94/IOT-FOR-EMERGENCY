@@ -1,5 +1,6 @@
 package univpm.iot_for_emergency.Model;
 
+import android.support.design.widget.TabLayout;
 import android.util.Log;
 
 import com.orm.SugarRecord;
@@ -121,6 +122,10 @@ public class TabPunti extends SugarRecord{
         coord[1]= Integer.parseInt(tabPunti.get(0).y);
         coord[2]= Integer.parseInt(tabPunti.get(0).quota);*/
         return tabPunti;
+    }
+
+    public int contaPunti(){
+        return (int) TabPunti.count(TabPunti.class);
     }
 
 
