@@ -8,7 +8,6 @@ import univpm.iot_for_emergency.Controller.Funzionali.BluetoothLeService;
 import univpm.iot_for_emergency.Controller.Funzionali.Mappa;
 import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
 import univpm.iot_for_emergency.R;
-
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -37,7 +36,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -291,10 +289,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void loguot(){
-        Intent i= new Intent("univpm.iot_for_emergency.View.Funzionali.Stop");
-        sendBroadcast(i);
         sessione.UtenteLoggato(false,sessione.user());
         sessione.UtenteGuest(false,sessione.user());
+        sessione.eliminaUser();
         finish();
         startActivity(new Intent(univpm.iot_for_emergency.View.Home.this,Login.class));
     }
@@ -440,11 +437,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private boolean isImmersiveModeEnabled() {
         return ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
     }
-
-    public void displayToast(String message){
-        Toast.makeText(Home.this, message, Toast.LENGTH_SHORT).show();
-    }
-
 
 
 }

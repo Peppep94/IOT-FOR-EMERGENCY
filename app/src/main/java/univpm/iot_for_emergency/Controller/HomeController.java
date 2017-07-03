@@ -1,16 +1,14 @@
 package univpm.iot_for_emergency.Controller;
 
-import android.widget.Toast;
 
 import java.util.List;
-
 import univpm.iot_for_emergency.Model.TabDatiBeacon;
 import univpm.iot_for_emergency.Model.TabPunti;
-import univpm.iot_for_emergency.View.Home;
 
 public class HomeController {
 
     private TabDatiBeacon tabDatiBeacon =new TabDatiBeacon();
+
     private TabPunti tabPunti=new TabPunti();
 
     public TabDatiBeacon getTabBeacon(String address){

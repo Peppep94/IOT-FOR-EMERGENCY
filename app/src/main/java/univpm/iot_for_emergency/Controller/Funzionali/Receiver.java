@@ -8,12 +8,10 @@ import android.util.Log;
 
 import java.text.DateFormat;
 import java.util.Date;
-
 import univpm.iot_for_emergency.Controller.HomeController;
 
 public class Receiver extends BroadcastReceiver {
     private Sessione sessione;
-    private boolean logout=false;
     private Handler mHandler;
     private Context ReceiverContext;
 
@@ -25,13 +23,9 @@ public class Receiver extends BroadcastReceiver {
         ReceiverContext=context;
 
 
-            if(("univpm.iot_for_emergency.View.Funzionali.Stop").equals(action)){
-                logout=true;
-            }
-
             if(("univpm.iot_for_emergency.View.Funzionali.Scaduto").equals(action)){
                 int stopperiod = intent.getIntExtra("stopperiod",5000);
-                if (!logout) {
+                if (sessione.user()!="logout") {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {

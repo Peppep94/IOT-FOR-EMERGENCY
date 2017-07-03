@@ -24,7 +24,6 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
-import univpm.iot_for_emergency.Model.TabPunti;
 import univpm.iot_for_emergency.Controller.Funzionali.InvioDatiService;
 import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
 import univpm.iot_for_emergency.Controller.LoginController;
@@ -38,7 +37,6 @@ public class Login extends AppCompatActivity {
     String ip;
     String porta;
     String soglia;
-    private LoginController loginController;
     private final static String TAG = Login.class.getSimpleName();
     private ProgressDialog progressDialogDB;
     private Button bLogin;
@@ -56,7 +54,6 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         sessione =new Sessione(this);
-        loginController=new LoginController();
         bLogin=(Button) findViewById(R.id.button);
         final Button bLoginGuest=(Button) findViewById(R.id.bLoginGuest);
         registerLink = (TextView) findViewById(R.id.RegisterHere);
@@ -151,7 +148,6 @@ public class Login extends AppCompatActivity {
 
 
     private void LetturaMappa() {
-        //TabPunti.deleteAll(TabPunti.class);
         AssetManager am1 = getAssets();
         InputStream is1 = null;
 
@@ -198,7 +194,6 @@ public class Login extends AppCompatActivity {
         intent.putExtra("arraypunti", a1);
         intent.putExtra("soglia", soglia);
         this.startService(intent);
-
 
 
 

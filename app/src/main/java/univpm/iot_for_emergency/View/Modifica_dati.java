@@ -22,12 +22,8 @@ import java.util.Calendar;
 
 import univpm.iot_for_emergency.Controller.Funzionali.InvioDatiService;
 import univpm.iot_for_emergency.Controller.Funzionali.Sessione;
-import univpm.iot_for_emergency.Controller.ModificaController;
 import univpm.iot_for_emergency.R;
 
-/**
- * Created by Giuseppe on 07/04/2017.
- */
 
 public class Modifica_dati extends AppCompatActivity {
 
@@ -37,7 +33,6 @@ public class Modifica_dati extends AppCompatActivity {
     private String Problemi;
 
     private int contatore=0;
-    private ModificaController modificaController;
 
     private Sessione sessione;
     protected TextView mDateDisplay;
@@ -54,10 +49,6 @@ public class Modifica_dati extends AppCompatActivity {
     EditText password;
     EditText confPassword;
     Button bconfmodifica;
-
-
-
-    private final static String TAG = ModificaController.class.getSimpleName();
 
 
     protected DatePickerDialog.OnDateSetListener mDateSetListener =

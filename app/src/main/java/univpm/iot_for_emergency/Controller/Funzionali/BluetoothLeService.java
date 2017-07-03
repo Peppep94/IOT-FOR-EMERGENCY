@@ -32,6 +32,8 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
+import univpm.iot_for_emergency.View.Home;
+import univpm.iot_for_emergency.View.Login;
 
 import static android.content.ContentValues.TAG;
 
@@ -55,9 +57,9 @@ public class BluetoothLeService extends Service {
     private static final int STATE_CONNECTED = 2;
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
-    private boolean logout=false;
     private String finaladdress;
     private static BluetoothGatt finalgatt;
+    private Sessione sessione;
 
 
 
@@ -73,7 +75,7 @@ public class BluetoothLeService extends Service {
         LetturaPeriodo();
         mHandler = new Handler();
         mBluetoothDeviceAddress="";
-        logout=false;
+        sessione=new Sessione(this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -85,10 +87,14 @@ public class BluetoothLeService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        logout=false;
         final Intent intent1 = new Intent("univpm.iot_for_emergency.View.Funzionali.Scansione");
         sendBroadcast(intent1);
-        scanLeDevice(true);
+        if (sessione.user()!="logout") {
+          scanLeDevice(true);
+        }else{
+            close();
+            disconnect();
+        }
         return Service.START_NOT_STICKY;
     }
 
@@ -124,7 +130,7 @@ public class BluetoothLeService extends Service {
             BluetoothDevice device = result.getDevice();
             final String deviceName = device.getName();
             mBluetoothDeviceAddress=device.getAddress();
-            if(!logout) {
+            if(sessione.user()!="logout") {
                 if (deviceName != null && deviceName.length() > 0) {
                     if (deviceName.contains("SensorTag")) {
                         connect();
@@ -139,6 +145,9 @@ public class BluetoothLeService extends Service {
                 } else {
                     Log.e("Errore", String.valueOf(callbackType));
                 }
+            }else{
+                close();
+                disconnect();
             }
         }
     };
@@ -174,8 +183,7 @@ public class BluetoothLeService extends Service {
         /*Metodo che viene richiamato quando cambia lo stato della connessione (da non connesso passo a connesso e viceversa) */
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            Log.e(TAG, String.valueOf(logout));
-            if(!logout){
+            if(sessione.user()!="logout"){
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mConnectionState = STATE_CONNECTED;
                 mBluetoothDeviceAddress=gatt.getDevice().getAddress();
@@ -186,6 +194,9 @@ public class BluetoothLeService extends Service {
                 mConnectionState = STATE_DISCONNECTED;
             }
             gatt.discoverServices();
+            }else{
+                close();
+                disconnect();
             }
         }
 
@@ -193,7 +204,7 @@ public class BluetoothLeService extends Service {
         /*Metodo che viene richiamato una volta che sono stati scoperti i servizi offerti dal dispositivo */
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if(!logout) {
+            if(sessione.user()!="logout") {
             /* Mi associo al service che mi interessa*/
                 BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
 
@@ -205,6 +216,9 @@ public class BluetoothLeService extends Service {
 
             /*Invio il dato al sensore*/
                 gatt.writeCharacteristic(enableHum);
+            }else{
+                close();
+                disconnect();
             }
 
         }
@@ -212,13 +226,16 @@ public class BluetoothLeService extends Service {
         /*Metodo che viene richiamato una volta che sono stati iviati dati al dispositivo */
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status){
-            if(!logout) {
+            if(sessione.user()!="logout") {
                 BluetoothGattService humidityService = gatt.getService(SensorTagGatt.UUID_HUM_SERV);
 
                 BluetoothGattCharacteristic humidityCharacteristic = humidityService.getCharacteristic(SensorTagGatt.UUID_HUM_DATA);
 
             /*richiedo di leggere il valore della caratteristica*/
                 gatt.readCharacteristic(humidityCharacteristic);
+            }else{
+                close();
+                disconnect();
             }
 
         }
@@ -226,7 +243,7 @@ public class BluetoothLeService extends Service {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            if(!logout){
+            if(sessione.user()!="logout"){
             /*Controllo se il valore è uguale a 0, se è così vuol dire che abbiamo preso il valore prima che il sensore si accendesse quindi provo a leggere di nuovo */
             byte []value=characteristic.getValue();
             int t = shortUnsignedAtOffset(value, 0);
@@ -238,6 +255,9 @@ public class BluetoothLeService extends Service {
                 broadcastUpdate("univpm.iot_for_emergency.View.Funzionali.Ricevuti",characteristic);
             }
 
+            }else{
+                close();
+                disconnect();
             }
         }
 
@@ -355,6 +375,15 @@ public class BluetoothLeService extends Service {
 
 
     }
+
+
+
+    public void displayToast(String message){
+        Toast.makeText(BluetoothLeService.this, message, Toast.LENGTH_SHORT).show();
+    }
+
+
+
 
 
 

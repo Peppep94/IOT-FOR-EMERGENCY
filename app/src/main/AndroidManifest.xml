@@ -65,7 +65,8 @@
         <service
             android:name=".Controller.Funzionali.BluetoothLeService"
             android:icon="@mipmap/ic_launcher"
-            android:label="MyService" />
+            android:label="MyService" >
+        </service>
 
         <receiver
             android:name=".Controller.Funzionali.Receiver"
@@ -75,7 +76,7 @@
                 <action android:name="univpm.iot_for_emergency.View.Funzionali.Ricevuti" />
                 <action android:name="univpm.iot_for_emergency.View.Registrazione"/>
                 <action android:name="univpm.iot_for_emergency.View.Funzionali.Trovato"/>
-                <action android:name="univpm.iot_for_emergency.View.Funzionali.Stop"/>
+                <action android:name="univpm.iot_for_emergency.View.Funzionali.Stoppato"/>
                 <action android:name="univpm.iot_for_emergency.View.Funzionali.Scaduto"/>
             </intent-filter>
         </receiver>
@@ -83,7 +84,8 @@
         <service
             android:name=".Controller.Funzionali.InvioDatiService"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

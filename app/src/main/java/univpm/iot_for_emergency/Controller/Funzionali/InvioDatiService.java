@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -30,37 +29,11 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
-
-import jxl.Cell;
-import jxl.CellView;
-import jxl.Hyperlink;
-import jxl.Image;
-import jxl.LabelCell;
-import jxl.Range;
-import jxl.Sheet;
-import jxl.SheetSettings;
-import jxl.Workbook;
-import jxl.format.CellFormat;
-import jxl.format.PageOrientation;
-import jxl.format.PaperSize;
-import jxl.read.biff.BiffException;
-import jxl.read.biff.File;
-import jxl.write.Label;
-import jxl.write.WritableCell;
-import jxl.write.WritableHyperlink;
-import jxl.write.WritableImage;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
 import univpm.iot_for_emergency.Controller.HomeController;
 import univpm.iot_for_emergency.Controller.LoginController;
 import univpm.iot_for_emergency.Model.TabPunti;
-
 import univpm.iot_for_emergency.R;
 import univpm.iot_for_emergency.View.Home;
-import univpm.iot_for_emergency.View.Login;
 
 public class InvioDatiService extends Service {
     private String Nome;
@@ -80,11 +53,11 @@ public class InvioDatiService extends Service {
     private String address;
     private String data;
     private String olduser;
-    String result;
-    String hum;
-    String temp;
-    String device;
-    String currentdate;
+    private String result;
+    private String hum;
+    private String temp;
+    private String device;
+    private String currentdate;
     private String azione;
     private Sessione sessione;
 
@@ -215,7 +188,7 @@ public class InvioDatiService extends Service {
 
                 z1 = z1 + 6;
                 i=i+1;
-                //Log.e("data",data);
+
             }
 
                 try {
@@ -359,7 +332,6 @@ public class InvioDatiService extends Service {
 
             BufferedReader bf = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String value = bf.readLine();
-            //System.out.println("Output:"+value);
             result= value;
             risposta = httpURLConnection.getResponseCode();
 
@@ -449,7 +421,6 @@ public class InvioDatiService extends Service {
             if(("univpm.iot_for_emergency.View.Login.Utenti").equals(azione)) {
                 Intent intent= new Intent("univpm.iot_for_emergency.View.Login.Utenti");
                 intent.putExtra("risultato", result);
-                //displayToast(result);
                 sendBroadcast(intent);
 
 

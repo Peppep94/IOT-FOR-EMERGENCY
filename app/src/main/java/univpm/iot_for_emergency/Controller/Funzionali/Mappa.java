@@ -4,30 +4,18 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
-
 import univpm.iot_for_emergency.Model.TabPunti;
 import univpm.iot_for_emergency.R;
-import univpm.iot_for_emergency.View.Home;
 
-/**
- * Created by Giuseppe on 13/05/2017.
- */
+
+
 
 public class Mappa  extends ImageView{
 
@@ -96,9 +84,7 @@ public class Mappa  extends ImageView{
             rect = new Rect((int) ((y - 419.125) * 8 - 35), (int) ((x - 42.375) * 7.8889 -5), (int) ((y - 419.125) * 8 + 15), (int) ((x - 42.375) * 7.8889 + 55));
         if(quota==155)
             rect = new Rect((int) ((y - 419.125) * 8 - 25), (int) ((x - 42.375) * 7.8889 - 30), (int) ((y - 419.125) * 8 + 25), (int) ((x - 42.375) * 7.8889 + 35));
-        //canvas.drawCircle((float) ((Float.parseFloat(ids[1])-419.125)*8), (float) ((Float.parseFloat(ids[0])-42.375)*7.8889),10,paint);
         canvas.drawBitmap(bmp2,null,rect,null);
-        //canvas.drawCircle((float) ((y-419.125)*8-30), (float) ((x-42.375)*7.8889+70),10,paint);
         return bmOverlay;
     }
 
@@ -140,9 +126,8 @@ public class Mappa  extends ImageView{
                 Rect rect1 = new Rect((int) ((y1 - 419.125) * 8 - 35), (int) ((x1 - 42.375) * 7.8889 - 45), (int) ((y1 - 419.125) * 8 + 35), (int) ((x1 - 42.375) * 7.8889 + 45));
                 canvas.drawBitmap(bmp3,null,rect1,null);
             }
-        }//canvas.drawCircle((float) ((Float.parseFloat(ids[1])-419.125)*8), (float) ((Float.parseFloat(ids[0])-42.375)*7.8889),10,paint);
+        }
         canvas.drawBitmap(bmp2,null,rect,null);
-        //canvas.drawCircle((float) ((y-419.125)*8-30), (float) ((x-42.375)*7.8889+70),10,paint);
         return bmOverlay;
     }
 

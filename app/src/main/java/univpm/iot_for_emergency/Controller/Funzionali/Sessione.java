@@ -34,6 +34,13 @@ public class Sessione {
         editor.commit();
     }
 
+    public void eliminaUser()
+    {
+        editor.remove("user");
+        editor.putString("user","logout");
+        editor.commit();
+    }
+
     public boolean loggedin(){
         return log.getBoolean("loggedInmode", false);
     }
