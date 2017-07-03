@@ -296,6 +296,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         startActivity(new Intent(univpm.iot_for_emergency.View.Home.this,Login.class));
     }
 
+    public void MostraDatiAmbientali(String temperature,String humidity,String currentDateTimeString){
+        toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
+        toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
+
+    }
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, Intent intent) {
@@ -304,26 +310,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti.Server").equals(action)) {
                 toolbar.setBackgroundColor(Color.RED);
-                String device=intent.getStringExtra("device");
-                String humidity=intent.getStringExtra("hum");
-                String temperature=intent.getStringExtra("temp");
-                String address[]= intent.getStringArrayExtra("address");
-
-                toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
-                String currentDateTimeString=intent.getStringExtra("data");
-                toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
-                TabPunti coord=homeController.TrovaCoordQuota(device);
-                List<TabPunti> pericolo=homeController.TrovaCoordQuotaPericolo(address);
-                imageView.init(toolbar,Integer.parseInt(coord.x),Integer.parseInt(coord.y),Integer.parseInt(coord.quota),pericolo);
-                PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
-                photoViewAttacher.update();
-                photoViewAttacher.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        fullScreen();
-                        return false;
-                    }
-                });
+                CaricaMappa(homeController,intent);
 
             }
             if (("univpm.iot_for_emergency.View.Funzionali.Ricevuti").equals(action)) {
@@ -331,9 +318,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 toolbar.setBackgroundColor(Color.parseColor("#009933"));
                 int humidity=(int)intent.getDoubleExtra("hum",1000);
                 int temperature=(int)intent.getDoubleExtra("temp",1000);
-                toolbar.setTitle("Temperatura "+String.valueOf(temperature)+"° Umidità "+ String.valueOf(humidity)+"%");
                 String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-                toolbar.setSubtitle("Aggiornato il "+ currentDateTimeString);
+                MostraDatiAmbientali(String.valueOf(temperature),String.valueOf(humidity),currentDateTimeString);
 
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Connesso").equals(action)) {
@@ -349,17 +335,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                     contatore++;
                 }
                 String device=intent.getStringExtra("device");
-                TabPunti coord=homeController.TrovaCoordQuota(device);
-                imageView.init(toolbar,Integer.parseInt(coord.x),Integer.parseInt(coord.y),Integer.parseInt(coord.quota));
-                PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
-                photoViewAttacher.update();
-                photoViewAttacher.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        fullScreen();
-                        return false;
-                    }
-                });
+                CaricaMappa(homeController,device);
+
             }
             if(("univpm.iot_for_emergency.View.Funzionali.Scaduto").equals(action)) {
                 if(contatore==0){
@@ -376,6 +353,41 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         }
     };
+
+    private  void CaricaMappa(HomeController homeController,String device)
+    {
+        TabPunti coord=homeController.TrovaCoordQuota(device);
+        imageView.init(toolbar,Integer.parseInt(coord.x),Integer.parseInt(coord.y),Integer.parseInt(coord.quota));
+        PintchToZoom();
+    }
+
+    private  void CaricaMappa(HomeController homeController,Intent intent)
+    {
+        String device=intent.getStringExtra("device");
+        String humidity=intent.getStringExtra("hum");
+        String temperature=intent.getStringExtra("temp");
+        String address[]= intent.getStringArrayExtra("address");
+        String currentDateTimeString=intent.getStringExtra("data");
+        MostraDatiAmbientali(temperature,humidity,currentDateTimeString);
+        TabPunti coord=homeController.TrovaCoordQuota(device);
+        List<TabPunti> pericolo=homeController.TrovaCoordQuotaPericolo(address);
+        imageView.init(toolbar,Integer.parseInt(coord.x),Integer.parseInt(coord.y),Integer.parseInt(coord.quota),pericolo);
+        PintchToZoom();
+    }
+
+
+    private  void PintchToZoom()
+    {
+        PhotoViewAttacher photoViewAttacher =new PhotoViewAttacher(imageView);
+        photoViewAttacher.update();
+        photoViewAttacher.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                fullScreen();
+                return false;
+            }
+        });
+    }
 
 
 

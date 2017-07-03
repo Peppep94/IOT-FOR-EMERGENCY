@@ -11,13 +11,11 @@ public class HomeController {
 
     private TabPunti tabPunti=new TabPunti();
 
-    public TabDatiBeacon getTabBeacon(String address){
-        return tabDatiBeacon.getDati(address);
-    }
+
 
     public void updatesaveBeacon(String address, String datetime,String temperature,String humidity){
 
-         tabDatiBeacon =getTabBeacon(address);
+         tabDatiBeacon =tabDatiBeacon.getTabBeacon(address);
 
          if(tabDatiBeacon.address.equals("0")){
              tabDatiBeacon =new TabDatiBeacon(address,datetime,temperature,humidity);

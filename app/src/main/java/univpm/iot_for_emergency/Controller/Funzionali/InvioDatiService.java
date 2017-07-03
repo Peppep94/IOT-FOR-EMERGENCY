@@ -255,7 +255,6 @@ public class InvioDatiService extends Service {
             temp= intent.getStringExtra("temp");
             device=intent.getStringExtra("device");
             currentdate =intent.getStringExtra("data");
-
             int soglia=sessione.soglia();
 
 
@@ -272,7 +271,7 @@ public class InvioDatiService extends Service {
                 e.printStackTrace();
             }
 
-            new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/beacon");
+            new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/AggiornaDati");
         }
 
 
@@ -290,7 +289,7 @@ public class InvioDatiService extends Service {
                 e.printStackTrace();
             }
 
-            new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/beacon2");
+            new send().execute("http://" + ip + ":" + porta + "/IOTServer/RicezioneDati/InvioNotifiche");
 
         }
 

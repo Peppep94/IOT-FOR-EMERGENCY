@@ -32,4 +32,9 @@ public class TabDatiBeacon extends SugarRecord{
 
     }
 
+    public TabDatiBeacon getTabBeacon(String address){
+        TabDatiBeacon tabDatiBeacon=new TabDatiBeacon();
+        return tabDatiBeacon.getDati(address);
+    }
+
 }

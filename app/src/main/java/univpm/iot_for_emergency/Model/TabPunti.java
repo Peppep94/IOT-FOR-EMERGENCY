@@ -98,10 +98,6 @@ public class TabPunti extends SugarRecord{
     public TabPunti TrovaCoordQuotaModel(String address)
     {
         List<TabPunti> tabPunti = TabPunti.find(TabPunti.class,"address=?",address);
-        /*int[] coord={0,0};
-        coord[0]= Integer.parseInt(tabPunti.get(0).x);
-        coord[1]= Integer.parseInt(tabPunti.get(0).y);
-        coord[2]= Integer.parseInt(tabPunti.get(0).quota);*/
         return tabPunti.get(0);
     }
 
